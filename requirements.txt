@@ -1,2 +1,2 @@
 Django==5.1.1
-flit==3.9.0
+Authlib

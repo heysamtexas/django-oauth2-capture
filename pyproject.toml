@@ -10,6 +10,10 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 description = "A simple Django reference implementation."
 version = "0.0.1"
+dependencies = [
+    "Authlib",
+]
+
 
 [project.urls]
 Home = "https://github.com/heysamtexas/django-package-boilerplate"
