@@ -1,0 +1,52 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "boom"
+authors = [{name = "SimpleCTO", email = "github+djpb@simplecto.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: MIT License"]
+description = "A simple Django reference implementation."
+version = "0.0.1"
+
+[project.urls]
+Home = "https://github.com/heysamtexas/django-package-boilerplate"
+
+# Set the maximum line length to 120.
+line-length = 120
+target-version = "py312"
+exclude = [
+    "pyproject.toml",
+    "development/**/tests/*",
+    "development/**/migrations/*",
+    ".idea/**",
+    "development/manage.py",
+]
+
+
+[tool.ruff.lint]
+# Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
+# overlap with the use of a formatter, like Black, but we can override this behavior by
+# explicitly adding the rule.
+ignore = [
+    "ANN101",
+    "E501",
+    "D203",
+    "D213",
+    "D100",
+    "COM812"
+]
+select = ["ALL", "W2", "I"]
+exclude = [
+    "pyproject.toml",
+    "development/**/tests/**",
+    "development/**/migrations/**",
+    ".idea/**",
+    "development/manage.py",
+]
+
+[tool.bandit]
+exclude = ["development/**/tests/**", "development/**/migrations/*"]
+skips = ["B106"]
