@@ -11,7 +11,7 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 description = "A simple Django reference implementation."
 version = "0.0.1"
 dependencies = [
-    "Authlib",
+    "requests",
 ]
 
 
@@ -23,8 +23,8 @@ line-length = 120
 target-version = "py312"
 exclude = [
     "pyproject.toml",
-    "development/**/tests/*",
-    "development/**/migrations/*",
+    "*/**/tests/*",
+    "*/**/migrations/*",
     ".idea/**",
     "development/manage.py",
 ]
@@ -45,8 +45,8 @@ ignore = [
 select = ["ALL", "W2", "I"]
 exclude = [
     "pyproject.toml",
-    "development/**/tests/**",
-    "development/**/migrations/**",
+    "*/**/tests/**",
+    "*/**/migrations/**",
     ".idea/**",
     "development/manage.py",
 ]
