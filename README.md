@@ -27,6 +27,15 @@ Install the package using pip:
 ```bash
 pip install django-oauth2-capture
 ```
+or while in development mode:
+```bash
+pip install -e .
+```
+
+or from another project, make sure to follow HEAD on master from https://github.com/heysamtexas/django-oauth2-capture:
+```bash
+pip install git+https://github.com/yourusername/django-oauth2-capture.git@master
+```
 
 ## Configuration
 Add it to your installed apps in your Django settings file:
