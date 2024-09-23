@@ -170,4 +170,9 @@ OAUTH2_CONFIG = {
         "client_secret": os.environ["GITHUB_CLIENT_SECRET"],
         "scope": "user repo issues write:discussion",
     },
+    "reddit": {
+        "client_id": os.environ["REDDIT_CLIENT_ID"],
+        "client_secret": os.environ["REDDIT_CLIENT_SECRET"],
+        "scope": "identity edit read submit save",
+    },
 }

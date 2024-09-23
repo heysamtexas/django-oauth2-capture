@@ -10,6 +10,7 @@ from urllib.parse import urlencode
 import requests
 from django.conf import settings
 from django.utils import timezone
+from requests.auth import HTTPBasicAuth
 
 from oauth2_capture.models import OAuthToken
 
@@ -387,6 +388,89 @@ class GitHubOAuth2Provider(OAuth2Provider):
         return response.json()
 
 
+class RedditOAuth2Provider(OAuth2Provider):
+    """Reddit OAuth2 provider."""
+
+    @property
+    def authorize_url(self) -> str:
+        """The URL to authorize the user."""
+        return "https://www.reddit.com/api/v1/authorize"
+
+    @property
+    def token_url(self) -> str:
+        """The URL to exchange the code for a token."""
+        return "https://www.reddit.com/api/v1/access_token"
+
+    @property
+    def user_info_url(self) -> str:
+        """The URL to get the user info."""
+        return "https://oauth.reddit.com/api/v1/me"
+
+    def get_user_info(self, access_token: str) -> dict:
+        """Get the user info from Reddit.
+
+        Args:
+            access_token (str): The access token.
+
+        Returns:
+            dict: The user info.
+
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(self.user_info_url, headers=headers, timeout=10)
+        return response.json()
+
+    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+        """Exchange the auth code for an access token.
+
+        Args:
+            code (str): The code.
+            redirect_uri (str): The redirect URI.
+
+        Returns:
+            dict: The token data.
+
+        """
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect_uri,
+            "client_id": self.config["client_id"],
+            "client_secret": self.config["client_secret"],
+        }
+        headers = {
+            "User-Agent": "AgentsAsylum/1.0 by simplecto",
+        }
+
+        auth = HTTPBasicAuth(self.config["client_id"], self.config["client_secret"])
+        response = requests.post(
+            self.token_url, data=data, auth=auth, headers=headers, timeout=10
+        )
+
+        return response.json()
+
+    def get_authorization_url(self, state: str, redirect_uri: str) -> str:
+        """Get the authorization URL for Reddit.
+
+        Args:
+            state (str): The state parameter.
+            redirect_uri (str): The redirect URI.
+
+        Returns:
+            str: The authorization URL.
+
+        """
+        params = {
+            "client_id": self.config["client_id"],
+            "redirect_uri": redirect_uri,
+            "response_type": "code",
+            "state": state,
+            "scope": self.config["scope"],
+            "duration": "permanent",
+        }
+        return f"{self.authorize_url}?{urlencode(params)}"
+
+
 class OAuth2ProviderFactory:
     """Factory class to get the OAuth2 provider."""
 
@@ -405,6 +489,7 @@ class OAuth2ProviderFactory:
             "twitter": TwitterOAuth2Provider,
             "linkedin": LinkedInOAuth2Provider,
             "github": GitHubOAuth2Provider,
+            "reddit": RedditOAuth2Provider,
         }
         provider_class = providers.get(provider_name)
         if not provider_class:
