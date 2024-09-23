@@ -12,6 +12,7 @@ description = "A simple Django reference implementation."
 version = "0.0.1"
 dependencies = [
     "requests",
+    "shortuuid==1.0.13"
 ]
 
 
