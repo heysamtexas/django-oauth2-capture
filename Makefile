@@ -13,9 +13,9 @@ help:
 
 .PHONY: bootstrap
 bootstrap: .venv/
-	pip install --upgrade pip
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
+	$(ENV_DIR)/bin/pip install --upgrade pip
+	$(ENV_DIR)/bin/pip install -r requirements.txt
+	$(ENV_DIR)/bin/pip install -r requirements-dev.txt
 
 # Create a new Django project and reusable app
 new_project: install
