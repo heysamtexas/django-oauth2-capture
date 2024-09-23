@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from boom.models import OAuthToken
+from oauth2_capture.models import OAuthToken
 
 
 @admin.register(OAuthToken)

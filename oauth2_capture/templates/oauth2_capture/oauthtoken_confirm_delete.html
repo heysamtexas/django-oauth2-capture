@@ -3,9 +3,9 @@
 {% block content %}
     <h1>Delete OAuth Token</h1>
     <p>Are you sure you want to delete the token for {{ object.provider }} ({{ object.name }})?</p>
-    <form action="{% url 'boom:revoke' slug=object.slug %}" method="post">
+    <form action="{% url 'oauth2_capture:revoke' slug=object.slug %}" method="post">
         {% csrf_token %}
         <input type="submit" value="Delete">
-        <a href="{% url 'boom:list' %}">Cancel</a>
+        <a href="{% url 'oauth2_capture:list' %}">Cancel</a>
     </form>
 {% endblock %}

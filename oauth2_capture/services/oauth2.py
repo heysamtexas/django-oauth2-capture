@@ -11,10 +11,11 @@ import requests
 from django.conf import settings
 from django.utils import timezone
 
-from boom.models import OAuthToken
+from oauth2_capture.models import OAuthToken
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p>
-        Welcome to the OAuth Management page. This page will allow you to authorize your LinkedIn account.
-    </p>
+    <h1>OAuth2 Capture Management</h1>
     <p>Logged in as {{ request.user }}</p>
     <p><a href="/admin">Goto to admin</a></p>
 
@@ -11,7 +9,7 @@
     <ul>
         {% for connection in connections %}
             <li>{{ connection.provider }} ({{ connection.name }})
-            <a href="{% url 'boom:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">X</a>
+            <a href="{% url 'oauth2_capture:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">X</a>
             </li>
         {% empty %}
             <li>No connections</li>
@@ -21,9 +19,9 @@
 
     <h4>Add new connections</h4>
     <ul>
-        <li><a href="{% url 'boom:initiate_oauth2' provider='linkedin' %}" onclick="openPopup(this.href); return false;">LinkedIn</a></li>
-        <li><a href="{% url 'boom:initiate_oauth2' provider='twitter' %}" onclick="openPopup(this.href); return false;">X (Twitter)</a></li>
-        <li><a href="{% url 'boom:initiate_oauth2' provider='github' %}" onclick="openPopup(this.href); return false;">Github</a></li>
+        <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='linkedin' %}" onclick="openPopup(this.href); return false;">LinkedIn</a></li>
+        <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='twitter' %}" onclick="openPopup(this.href); return false;">X (Twitter)</a></li>
+        <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='github' %}" onclick="openPopup(this.href); return false;">Github</a></li>
     </ul>
     <hr/>
     <ul>

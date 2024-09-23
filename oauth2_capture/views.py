@@ -8,8 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView
 
-from boom.models import OAuthToken
-from boom.services.oauth2 import OAuth2ProviderFactory
+from oauth2_capture.models import OAuthToken
+from oauth2_capture.services.oauth2 import OAuth2ProviderFactory
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
         return HttpResponse(str(e), status=400)
 
     code = request.GET.get("code")
-    redirect_uri = request.build_absolute_uri(f"/boom/{provider}/callback/")
+    redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
 
     token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri)
 
@@ -74,7 +74,7 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
         return HttpResponse(str(e), status=400)
 
     state = secrets.token_urlsafe(32)
-    redirect_uri = request.build_absolute_uri(f"/boom/{provider}/callback/")
+    redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
     auth_url = oauth2_provider.get_authorization_url(state, redirect_uri)
 
     # Store state in session for later verification
@@ -87,7 +87,7 @@ class DeleteOAuthTokenView(LoginRequiredMixin, DeleteView):
     """View for deleting an OAuth token."""
 
     model = OAuthToken
-    success_url = reverse_lazy("boom:list")
+    success_url = reverse_lazy("oauth2_capture:list")
 
     def get_queryset(self) -> QuerySet:
         """Return the queryset of OAuth tokens owned by the current user."""

@@ -1,19 +1,30 @@
+import os
 from pathlib import Path
+
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / "env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "secretkey123"  # noqa: S105
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -25,7 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "boom",
+    "oauth2_capture",
 ]
 
 MIDDLEWARE = [
@@ -43,7 +54,7 @@ ROOT_URLCONF = "development.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,3 +121,53 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_REDIRECT_URL = "/admin/login/"
+
+# logging config to show debug messages
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(message)s [%(pathname)s:%(lineno)d]"
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+        "oauth2_capture": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
+
+# settings.py
+
+OAUTH2_CONFIG = {
+    "twitter": {
+        "client_id": os.environ["TWITTER_CLIENT_ID"],
+        "client_secret": os.environ["TWITTER_CLIENT_SECRET"],
+        "scope": "tweet.read users.read tweet.write offline.access",
+        "code_verifier": "challenge",
+    },
+    "linkedin": {
+        "client_id": os.environ["LINKEDIN_CLIENT_ID"],
+        "client_secret": os.environ["LINKEDIN_CLIENT_SECRET"],
+        "scope": "profile email openid w_member_social",
+    },
+    "github": {
+        "client_id": os.environ["GITHUB_CLIENT_ID"],
+        "client_secret": os.environ["GITHUB_CLIENT_SECRET"],
+        "scope": "user repo issues write:discussion",
+    },
+}
