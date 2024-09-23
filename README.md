@@ -1,26 +1,39 @@
-# Django OAuth2 Token Capture
+# OAuth2 Token Capture for Django
 
-This Django package enables easy capture of OAuth2 tokens from various providers like LinkedIn and GitHub.
+This Django package that enables easy capture of OAuth2 tokens from various
+providers like X (Twitter), LinkedIn, and GitHub.
 
 ## Features
 
 - OAuth2 token exchange
 - User information retrieval
 - Support for multiple providers
+- Easily extendable to support new providers
+
+## Requirements
+
+- Python 3.6+
+- Django 3.0+
+- requests
+
+You will also need to setup an OAuth2 application with each provider you want to
+use. This will give you a client ID and client secret that you will need to
+configure the package.
 
 ## Installation
 
 Install the package using pip:
 
 ```bash
-pip install django-oauth2-token-capture
+pip install django-oauth2-capture
 ```
 
 ## Configuration
+Add it to your installed apps in your Django settings file:
 ```python
 INSTALLED_APPS = [
     ...
-    'django_oauth2_token_capture',
+    'oauth2_capture',
     ...
 ]
 ```
@@ -83,6 +96,20 @@ sequenceDiagram
 ```
 Note: if the user is not logged in at their provider, they will be prompted to
 login before they can authorize the client. (This is not shown in the diagram)
+
+## Setting up your development environment
+
+1. Clone the repository
+2. Create a virtual environment
+3. Install the requirements
+4. Configure the environment variables
+   1. Acquire the client ID and client secret from the providers
+   2. Put client_id and secrets into local `env` file in the `development/`
+      folder
+5. Migrate the database with `python manage.py migrate`
+
+```bash
+
 
 ## License
 
