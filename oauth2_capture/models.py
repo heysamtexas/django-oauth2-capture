@@ -10,9 +10,7 @@ class OAuthToken(models.Model):
         help_text="The name of the OAuth provider (e.g., 'google', 'github', 'facebook').",
     )
     slug = ShortUUIDField()
-    access_token = models.CharField(
-        max_length=500, help_text="The OAuth access token for API access."
-    )
+    access_token = models.TextField(help_text="The OAuth access token for API access.")
     expires_at = models.DateTimeField(
         null=True,
         blank=True,
