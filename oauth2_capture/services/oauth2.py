@@ -473,12 +473,18 @@ class RedditOAuth2Provider(OAuth2Provider):
         response = requests.get(self.user_info_url, headers=headers, timeout=10)
         return response.json()
 
-    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
             code (str): The code.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             dict: The token data.
@@ -502,12 +508,18 @@ class RedditOAuth2Provider(OAuth2Provider):
 
         return response.json()
 
-    def get_authorization_url(self, state: str, redirect_uri: str) -> str:
+    def get_authorization_url(
+        self,
+        state: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> str:
         """Get the authorization URL for Reddit.
 
         Args:
             state (str): The state parameter.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             str: The authorization URL.
