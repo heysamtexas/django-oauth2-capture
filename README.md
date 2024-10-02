@@ -123,3 +123,13 @@ login before they can authorize the client. (This is not shown in the diagram)
 ## License
 
 - see [LICENSE](LICENSE) file
+
+
+## Appendix
+
+### Provider's endpoints, docs, etc
+
+- [Twitter](https://developer.twitter.com/en/docs/authentication/oauth-2-0)
+- [LinkedIn](https://docs.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?context=linkedin/context)
+- [GitHub](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps)
+- [Reddit](https://github.com/reddit-archive/reddit/wiki/OAuth2)

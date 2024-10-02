@@ -33,7 +33,7 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     code = request.GET.get("code")
     redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
 
-    token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri)
+    token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri, request)
 
     msg = f"Token data: {token_data}"
     logger.debug(msg)
@@ -75,7 +75,7 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
 
     state = secrets.token_urlsafe(32)
     redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
-    auth_url = oauth2_provider.get_authorization_url(state, redirect_uri)
+    auth_url = oauth2_provider.get_authorization_url(state, redirect_uri, request)
 
     # Store state in session for later verification
     request.session[f"{provider}_oauth_state"] = state

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import logging
+import secrets
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -16,9 +18,37 @@ from oauth2_capture.models import OAuthToken
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
+    from django.http import HttpRequest
 
 
 logger = logging.getLogger(__name__)
+
+
+def generate_code_verifier(length: int = 128) -> str:
+    """Generate a code verifier for PKCE.
+
+    Args:
+        length (int): The length of the code verifier.
+
+    Returns:
+        str: The code verifier.
+
+    """
+    return secrets.token_urlsafe(length)
+
+
+def generate_code_challenge(verifier: str) -> str:
+    """Generate a code challenge for PKCE.
+
+    Args:
+        verifier (str): The code verifier.
+
+    Returns:
+        str: The code challenge.
+
+    """
+    sha256 = hashlib.sha256(verifier.encode("utf-8")).digest()
+    return base64.urlsafe_b64encode(sha256).decode("utf-8").rstrip("=")
 
 
 class OAuth2Provider(ABC):
@@ -61,12 +91,18 @@ class OAuth2Provider(ABC):
 
         """
 
-    def get_authorization_url(self, state: str, redirect_uri: str) -> str:
+    def get_authorization_url(
+        self,
+        state: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> str:
         """Get the authorization URL for the provider.
 
         Args:
             state (str): The state parameter.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             str: The authorization URL.
@@ -82,12 +118,15 @@ class OAuth2Provider(ABC):
         return f"{self.authorize_url}?{urlencode(params)}"
 
     @abstractmethod
-    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+    def exchange_code_for_token(
+        self, code: str, redirect_uri: str, request: HttpRequest
+    ) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
             code (str): The code.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             dict: The token data.
@@ -190,25 +229,34 @@ class TwitterOAuth2Provider(OAuth2Provider):
         """The URL to get the user info."""
         return "https://api.twitter.com/2/users/me"
 
-    def get_authorization_url(self, state: str, redirect_uri: str) -> str:
+    def get_authorization_url(
+        self, state: str, redirect_uri: str, request: HttpRequest
+    ) -> str:
         """Get the authorization URL for Twitter. Override to include PKCE.
 
         Args:
             state (str): The state parameter.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             str: The authorization URL.
 
         """
+        # Generate code verifier and code challenge
+        code_verifier = generate_code_verifier()
+        code_challenge = generate_code_challenge(code_verifier)
+
+        request.session["code_verifier"] = code_verifier
+
         params = {
             "client_id": self.config["client_id"],
             "redirect_uri": redirect_uri,
             "response_type": "code",
             "state": state,
             "scope": self.config["scope"],
-            "code_challenge": "challenge",
-            "code_challenge_method": "plain",
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256",
         }
         return f"{self.authorize_url}?{urlencode(params)}"
 
@@ -229,17 +277,22 @@ class TwitterOAuth2Provider(OAuth2Provider):
         )
         return response.json().get("data", {})
 
-    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+    def exchange_code_for_token(
+        self, code: str, redirect_uri: str, request: HttpRequest
+    ) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
             code (str): The code.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             dict: The token data.
 
         """
+        code_verifier = request.session.get("code_verifier")
+
         # Override to include PKCE
         data = {
             "grant_type": "authorization_code",
@@ -247,7 +300,7 @@ class TwitterOAuth2Provider(OAuth2Provider):
             "redirect_uri": redirect_uri,
             "client_id": self.config["client_id"],
             "client_secret": self.config["client_secret"],
-            "code_verifier": "challenge",
+            "code_verifier": code_verifier,
         }
 
         # Use Basic Auth for Twitter
