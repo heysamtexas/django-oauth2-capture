@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <style>
+            body, html {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            main {
+                padding: 1rem;
+            }
+            ul#menu {
+                display: inline-block;
+                list-style-type: none;
+                padding: 0 0;
+            }
+            ul#menu li {
+                display: inline;
+                margin: 0;
+                padding: 0;
+            }
+
+            li > a {
+                color: blue;
+                padding: 0.25rem;
+            }
+
+            nav {
+                background-color: #f0f0f0;
+                padding: 0 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        {% for m in messages %}
+        <div style="padding: 0.25rem; background-color: orange">{{ m }}</div>
+        {% endfor %}
+        <nav>
+            <span style="font-weight: bold; margin-right: 3rem;">OAuth2 Capture demo</span>
+
+            <ul id="menu">
+                <li><a href="{% url "demo:index" %}" title="Test posts">Test posts</a></li>
+                <li><a href="{% url "oauth2_capture:list" %}" title="List of OAuth2 Capture">List of OAuth2 Capture</a></li>
+                <li><a href="/admin" title="Go to admin">Admin</a></li>
+            </ul>
+
+        </nav>
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </body>
+</html>

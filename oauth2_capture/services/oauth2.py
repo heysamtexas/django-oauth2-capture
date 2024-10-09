@@ -14,11 +14,10 @@ from django.conf import settings
 from django.utils import timezone
 from requests.auth import HTTPBasicAuth
 
-from oauth2_capture.models import OAuthToken
-
 if TYPE_CHECKING:
-    from django.contrib.auth.models import User
     from django.http import HttpRequest
+
+    from oauth2_capture.models import OAuthToken
 
 
 logger = logging.getLogger(__name__)
@@ -149,30 +148,35 @@ class OAuth2Provider(ABC):
             "client_id": self.config["client_id"],
             "client_secret": self.config["client_secret"],
         }
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        # Encode the client_id and client_secret
+        credentials = f"{self.config["client_id"]}:{self.config["client_secret"]}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+        headers = {
+            "Authorization": f"Basic {encoded_credentials}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
         response = requests.post(self.token_url, data=data, headers=headers, timeout=10)
         return response.json()
 
-    def get_valid_token(self, user: User) -> str | None:
+    def get_valid_token(self, oauth_token: OAuthToken) -> str | None:
         """Get a valid access token for the user. If the token is expired, it will be refreshed.
 
         Args:
-            user (User): The user.
+            oauth_token (OAuthToken): The user.
 
         Returns:
             str|None: The access token or None if there is no token.
 
         """
-        try:
-            oauth_token = OAuthToken.objects.get(
-                provider=self.provider_name, owner=user
-            )
-        except OAuthToken.DoesNotExist:
-            return None
-
         if oauth_token.expires_at <= timezone.now():
             token_data = self.refresh_token(oauth_token.refresh_token)
-            self.update_token(oauth_token, token_data)
+            self.update_token(
+                oauth_token=oauth_token,
+                token_data=token_data,
+                user_info=self.get_user_info(token_data["access_token"]),
+            )
 
         return oauth_token.access_token
 

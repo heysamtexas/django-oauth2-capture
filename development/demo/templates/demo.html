@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}OAuth2 Capture development site{% endblock %}
+
+{% block content %}
+<h1>Send test posts</h1>
+
+    {% for t in tokens %}
+    <div style="padding-bottom: 1rem">
+    <form action="{% url 'demo:x' slug=t.slug %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Send test post to {{ t.provider }} ({{ t.owner }})">
+    </form>
+    </div>
+    {% endfor %}
+{% endblock %}

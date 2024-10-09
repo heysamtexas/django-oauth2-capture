@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>OAuth2 Capture development site</title>
-    </head>
-    <body>
-        <h1>OAuth2 Capture development site</h1>
-        <ul>
-            <li><a href="{% url "oauth2_capture:list" %}" title="List of OAuth2 Capture">List of OAuth2 Capture</a></li>
-            <li><a href="/admin" title="Go to admin">Admin</a></li>
-        </ul>
-    </body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}OAuth2 Capture development site{% endblock %}
+
+{% block content %}
+    <h1>OAuth2 Capture development site</h1>
+    <p>
+    Use the menu above to do the things.
+    </p>
+{% endblock %}
