@@ -131,7 +131,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(message)s [%(pathname)s:%(lineno)d]"
+            "format": "%(name)s : %(levelname)s %(asctime)s %(message)s [%(pathname)s:%(lineno)d]"
         },
     },
     "handlers": {
@@ -141,13 +141,10 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-        },
-        "oauth2_capture": {
+        "": {
             "handlers": ["console"],
             "level": "DEBUG",
+            "propagate": False,
         },
     },
 }

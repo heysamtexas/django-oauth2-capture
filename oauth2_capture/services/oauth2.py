@@ -171,6 +171,8 @@ class OAuth2Provider(ABC):
 
         """
         if oauth_token.expires_at <= timezone.now():
+            msg = f"Token for {oauth_token.provider}:{oauth_token.name} has expired. Refreshing..."
+            logger.debug(msg)
             token_data = self.refresh_token(oauth_token.refresh_token)
             self.update_token(
                 oauth_token=oauth_token,
@@ -178,6 +180,7 @@ class OAuth2Provider(ABC):
                 user_info=self.get_user_info(token_data["access_token"]),
             )
 
+        logger.debug("Token for %s:%s is valid", oauth_token.provider, oauth_token.name)
         return oauth_token.access_token
 
     def update_token(

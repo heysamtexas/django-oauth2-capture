@@ -1,3 +1,6 @@
+import logging
+import uuid
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
@@ -8,6 +11,8 @@ from services.oauth2 import OAuth2ProviderFactory
 
 from demo.services import post_to_twitter, publish_to_linkedin
 from oauth2_capture.models import OAuthToken
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -24,8 +29,11 @@ def x_post(request: HttpRequest, slug: str) -> HttpResponse:
     """Handle POST requests."""
     token = get_object_or_404(OAuthToken, slug=slug)
     oa2 = OAuth2ProviderFactory.get_provider("twitter").get_valid_token(token)
-    url = post_to_twitter("Hello, world!", oa2)
-    messages.success(request, f"Tweet created: {url} ")
+    junk = uuid.uuid4().hex
+    url = post_to_twitter(f"Hello, world: {junk}", oa2)
+    msg = f"Tweet created: {url}"
+    logger.info(msg)
+    messages.success(request, msg)
     return redirect("/")
 
 
