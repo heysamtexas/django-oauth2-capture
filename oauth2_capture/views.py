@@ -80,6 +80,7 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
     # Store state in session for later verification
     request.session[f"{provider}_oauth_state"] = state
 
+    logger.debug("Redirecting to %s", auth_url)
     return redirect(auth_url)
 
 

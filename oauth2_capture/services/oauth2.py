@@ -197,13 +197,17 @@ class OAuth2Provider(ABC):
             None
 
         """
+        logger.debug(token_data)
+
         oauth_token.access_token = token_data["access_token"]
         oauth_token.refresh_token = token_data.get(
             "refresh_token", oauth_token.refresh_token
         )
-        oauth_token.expires_at = timezone.now() + timedelta(
-            seconds=token_data["expires_in"]
-        )
+
+        if "expires_in" in token_data:
+            oauth_token.expires_at = timezone.now() + timedelta(
+                seconds=token_data["expires_in"]
+            )
         if "refresh_token_expires_in" in token_data:
             oauth_token.refresh_token_expires_at = timezone.now() + timedelta(
                 seconds=token_data["refresh_token_expires_in"]
