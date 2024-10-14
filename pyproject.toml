@@ -9,7 +9,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 description = "A simple Django reference implementation."
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
     "requests",
     "shortuuid==1.0.13"
@@ -55,3 +55,15 @@ exclude = [
 [tool.bandit]
 exclude = ["development/**/tests/**", "development/**/migrations/*"]
 skips = ["B106"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.7"
+tag_format = "$version"
+bump_message = "bump: version $current_version → $new_version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+changelog_incremental = true
+version_files = [
+    "pyproject.toml:^version",
+]

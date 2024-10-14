@@ -362,12 +362,18 @@ class LinkedInOAuth2Provider(OAuth2Provider):
         logger.debug("LinkedIn user info: %s", res)
         return res
 
-    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
             code (str): The code.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             dict: The token data.
@@ -425,12 +431,18 @@ class GitHubOAuth2Provider(OAuth2Provider):
 
         return res
 
-    def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict:
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
             code (str): The code.
             redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
 
         Returns:
             dict: The token data.
