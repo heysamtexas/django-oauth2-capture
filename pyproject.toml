@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "oauth2_capture"
-version = "0.0.8"
+version = "0.0.9"
 authors = [{name = "SimpleCTO", email = "github+oauth2_capture@simplecto.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -65,5 +65,5 @@ update_changelog_on_bump = true
 changelog_file = "CHANGELOG.md"
 changelog_incremental = true
 version_files = [
-    "pyproject.toml:^version",
+    "pyproject.toml:version",
 ]
