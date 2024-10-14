@@ -9,7 +9,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 description = "A simple Django reference implementation."
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
     "requests",
     "shortuuid==1.0.13"
