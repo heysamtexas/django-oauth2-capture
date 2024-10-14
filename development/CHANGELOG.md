@@ -1,3 +1,9 @@
+## 0.0.9 (2024-10-14)
+
+### Fix
+
+- **oauth2,logging**: safety checks on returned values in oauth2 flow
+
 ## 0.0.8 (2024-10-14)
 
 ### Fix
