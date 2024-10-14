@@ -16,6 +16,7 @@ bootstrap: .venv/
 	$(ENV_DIR)/bin/pip install --upgrade pip
 	$(ENV_DIR)/bin/pip install -r requirements.txt
 	$(ENV_DIR)/bin/pip install -r requirements-dev.txt
+	$(ENV_DIR)/bin/pip install -e .
 
 # Create a new Django project and reusable app
 new_project: install
