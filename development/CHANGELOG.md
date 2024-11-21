@@ -1,3 +1,9 @@
+## 0.1.0 (2024-11-21)
+
+### Feat
+
+- **oath2_token**: added username property to help display see what username is attached
+
 ## 0.0.9 (2024-10-14)
 
 ### Fix
