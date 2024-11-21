@@ -25,7 +25,7 @@ configure the package.
 Install the package using pip:
 
 ```bash
-pip install django-oauth2-capture
+pip install oauth2_capture
 ```
 or while in development mode:
 ```bash
