@@ -65,7 +65,7 @@ class OAuthToken(models.Model):
 
     def __str__(self) -> str:
         """Return the name of the OAuth token."""
-        return f"{self.provider} token for {self.owner.username}"
+        return f"{self.provider}: {self.name}"
 
     def is_expired(self) -> bool:
         """Check if the token has expired."""
@@ -74,3 +74,12 @@ class OAuthToken(models.Model):
         if self.expires_at:
             return timezone.now() > self.expires_at
         return False
+
+    @property
+    def username(self) -> str:
+        """Return the username associated with the OAuth token."""
+        return (
+            self.profile_json.get("username", "")
+            or self.profile_json.get("login", "")
+            or self.name
+        )

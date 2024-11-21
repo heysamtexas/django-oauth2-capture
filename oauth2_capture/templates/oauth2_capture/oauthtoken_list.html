@@ -8,7 +8,7 @@
     <h4>Connections</h4>
     <ul>
         {% for connection in connections %}
-            <li>{{ connection.provider }} ({{ connection.name }})
+            <li>{{ connection.provider }} ({{ connection.username }})
             <a href="{% url 'oauth2_capture:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">X</a>
             </li>
         {% empty %}
