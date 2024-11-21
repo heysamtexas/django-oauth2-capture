@@ -42,6 +42,7 @@ Source = "https://github.com/heysamtexas/oauth2_capture"
 Issues = "https://github.com/heysamtexas/oauth2_capture/issues"
 
 
+[tool.ruff]
 
 # Set the maximum line length to 120.
 line-length = 120
