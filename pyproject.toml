@@ -30,7 +30,7 @@ dependencies = [
 
 dev = [
     "ruff==0.9.5",
-    "pre-commit==4.0.1",
+    "pre-commit==4.1.0",
     "flit==3.10.1",
 ]
 
