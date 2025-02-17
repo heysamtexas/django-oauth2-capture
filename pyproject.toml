@@ -29,7 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 
 dev = [
-    "ruff==0.9.5",
+    "ruff==0.9.6",
     "pre-commit==4.1.0",
     "flit==3.10.1",
 ]
