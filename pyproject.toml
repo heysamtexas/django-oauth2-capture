@@ -93,4 +93,4 @@ version_files = [
     "oauth2_capture/__init__.py:__version__",
     "pyproject.toml:tool.commitizen.version"
 ]
-version_provider = "commitizen"
+version_provider = "commitizen.tools.version"
