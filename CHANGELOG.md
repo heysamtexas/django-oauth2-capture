@@ -1,3 +1,10 @@
+## 0.1.8 (2025-03-05)
+
+### Feat
+
+- **oauth**: show a nice table of acquired tokens
+- **oauth2**: listing more metadata about captured tokens
+
 ## 0.1.6 (2025-03-05)
 
 ## 0.1.5 (2025-03-05)
