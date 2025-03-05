@@ -83,7 +83,7 @@ skips = ["B106"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2.1"
+version = "0.2.2"
 tag_format = "$version"
 bump_message = "bump: version $current_version → $new_version"
 update_changelog_on_bump = true
