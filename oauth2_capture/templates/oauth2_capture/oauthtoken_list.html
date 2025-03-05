@@ -5,16 +5,34 @@
     <p>Logged in as {{ request.user }}</p>
     <p><a href="/admin">Goto to admin</a></p>
 
-    <h4>Connections</h4>
-    <ul>
+    <h4>Active Connections</h4>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Provider</th>
+                <th>Username</th>
+                <th>Token Expired</th>
+                <th>Expired At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
         {% for connection in connections %}
-            <li>{{ connection.provider }} ({{ connection.username }})
-            <a href="{% url 'oauth2_capture:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">X</a>
-            </li>
+            <tr>
+                <td>{{ connection.provider }}</td>
+                <td>{{ connection.username }}</td>
+                <td style="text-align: center">{{ connection.is_expired }}</td>
+                <td>{{ connection.expires_in_humanized }}</td>
+                <td>
+                    <a href="{% url 'oauth2_capture:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">Revoke</a>
+                </td>
+            </tr>
         {% empty %}
-            <li>No connections</li>
+            <tr><td colspan="2">No connections</td></tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 
 
     <h4>Add new connections</h4>

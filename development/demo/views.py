@@ -7,10 +7,10 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from services.oauth2 import OAuth2ProviderFactory
 
 from demo.services import post_to_twitter, publish_to_linkedin
 from oauth2_capture.models import OAuthToken
+from oauth2_capture.services.oauth2 import OAuth2ProviderFactory
 
 logger = logging.getLogger(__name__)
 

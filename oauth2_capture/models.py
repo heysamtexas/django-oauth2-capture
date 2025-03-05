@@ -1,4 +1,6 @@
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
+from django.utils import timezone
 from shortuuid.django_fields import ShortUUIDField
 
 
@@ -65,13 +67,20 @@ class OAuthToken(models.Model):
         """Return the name of the OAuth token."""
         return f"{self.provider} ({self.name}) @ {self.owner}"
 
+    @property
     def is_expired(self) -> bool:
         """Check if the token has expired."""
-        from django.utils import timezone
-
         if self.expires_at:
             return timezone.now() > self.expires_at
         return False
+
+    @property
+    def expires_in_humanized(self) -> str:
+        """Return the expiration time in humanized format (e.g., '2 days from now, never, or 2 days ago')."""
+        if not self.expires_at:
+            return "Never"
+
+        return naturaltime(self.expires_at)
 
     @property
     def username(self) -> str:
