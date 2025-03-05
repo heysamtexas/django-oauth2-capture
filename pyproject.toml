@@ -90,7 +90,7 @@ update_changelog_on_bump = true
 changelog_file = "CHANGELOG.md"
 changelog_incremental = true
 version_files = [
-    "oauth2_capture/__init__.py:__version__",
-    "pyproject.toml:tool.commitizen.version"
+    "oauth2_capture/__init__.py",
+    "pyproject.toml:version"
 ]
-version_provider = "commitizen.tools.version"
+version_provider = "commitizen"
