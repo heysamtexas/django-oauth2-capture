@@ -48,9 +48,7 @@ class OAuthToken(models.Model):
         related_name="oauth_tokens",
         help_text="A reference to the local user this OAuth token is associated with.",
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True, help_text="The timestamp when the token was issued."
-    )
+    created_at = models.DateTimeField(auto_now_add=True, help_text="The timestamp when the token was issued.")
 
     profile_json = models.JSONField(null=True, blank=True)
 
@@ -65,7 +63,7 @@ class OAuthToken(models.Model):
 
     def __str__(self) -> str:
         """Return the name of the OAuth token."""
-        return f"{self.provider}: {self.name}"
+        return f"{self.provider} ({self.name}) @ {self.owner}"
 
     def is_expired(self) -> bool:
         """Check if the token has expired."""
@@ -78,8 +76,4 @@ class OAuthToken(models.Model):
     @property
     def username(self) -> str:
         """Return the username associated with the OAuth token."""
-        return (
-            self.profile_json.get("username", "")
-            or self.profile_json.get("login", "")
-            or self.name
-        )
+        return self.profile_json.get("username", "") or self.profile_json.get("login", "") or self.name
