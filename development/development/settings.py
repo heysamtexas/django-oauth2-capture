@@ -130,9 +130,7 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "%(name)s : %(levelname)s %(asctime)s %(message)s [%(pathname)s:%(lineno)d]"
-        },
+        "verbose": {"format": "%(name)s : %(levelname)s %(asctime)s %(message)s [%(pathname)s:%(lineno)d]"},
     },
     "handlers": {
         "console": {
@@ -172,5 +170,10 @@ OAUTH2_CONFIG = {
         "client_id": os.environ["REDDIT_CLIENT_ID"],
         "client_secret": os.environ["REDDIT_CLIENT_SECRET"],
         "scope": "identity edit read submit save",
+    },
+    "pinterest": {
+        "client_id": os.environ["PINTEREST_CLIENT_ID"],
+        "client_secret": os.environ["PINTEREST_CLIENT_SECRET"],
+        "scope": "user_accounts:read boards:read_secret boards:read boards:write_secret boards:write pins:read pins:write pins:read_secret pins:write_secret",
     },
 }

@@ -117,9 +117,7 @@ class OAuth2Provider(ABC):
         return f"{self.authorize_url}?{urlencode(params)}"
 
     @abstractmethod
-    def exchange_code_for_token(
-        self, code: str, redirect_uri: str, request: HttpRequest
-    ) -> dict:
+    def exchange_code_for_token(self, code: str, redirect_uri: str, request: HttpRequest) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
@@ -150,7 +148,7 @@ class OAuth2Provider(ABC):
         }
 
         # Encode the client_id and client_secret
-        credentials = f"{self.config["client_id"]}:{self.config["client_secret"]}"
+        credentials = f"{self.config['client_id']}:{self.config['client_secret']}"
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
 
         headers = {
@@ -183,9 +181,7 @@ class OAuth2Provider(ABC):
         logger.debug("Token for %s:%s is valid", oauth_token.provider, oauth_token.name)
         return oauth_token.access_token
 
-    def update_token(
-        self, oauth_token: OAuthToken, token_data: dict, user_info: dict
-    ) -> None:
+    def update_token(self, oauth_token: OAuthToken, token_data: dict, user_info: dict) -> None:
         """Update the OAuth token with the new data.
 
         Args:
@@ -200,14 +196,10 @@ class OAuth2Provider(ABC):
         logger.debug(token_data)
 
         oauth_token.access_token = token_data["access_token"]
-        oauth_token.refresh_token = token_data.get(
-            "refresh_token", oauth_token.refresh_token
-        )
+        oauth_token.refresh_token = token_data.get("refresh_token", oauth_token.refresh_token)
 
         if "expires_in" in token_data:
-            oauth_token.expires_at = timezone.now() + timedelta(
-                seconds=token_data["expires_in"]
-            )
+            oauth_token.expires_at = timezone.now() + timedelta(seconds=token_data["expires_in"])
         if "refresh_token_expires_in" in token_data:
             oauth_token.refresh_token_expires_at = timezone.now() + timedelta(
                 seconds=token_data["refresh_token_expires_in"]
@@ -240,9 +232,7 @@ class TwitterOAuth2Provider(OAuth2Provider):
         """The URL to get the user info."""
         return "https://api.twitter.com/2/users/me"
 
-    def get_authorization_url(
-        self, state: str, redirect_uri: str, request: HttpRequest
-    ) -> str:
+    def get_authorization_url(self, state: str, redirect_uri: str, request: HttpRequest) -> str:
         """Get the authorization URL for Twitter. Override to include PKCE.
 
         Args:
@@ -283,14 +273,10 @@ class TwitterOAuth2Provider(OAuth2Provider):
         """
         headers = {"Authorization": f"Bearer {access_token}"}
         params = {"user.fields": "id,name,username,profile_image_url,description"}
-        response = requests.get(
-            self.user_info_url, headers=headers, params=params, timeout=10
-        )
+        response = requests.get(self.user_info_url, headers=headers, params=params, timeout=10)
         return response.json().get("data", {})
 
-    def exchange_code_for_token(
-        self, code: str, redirect_uri: str, request: HttpRequest
-    ) -> dict:
+    def exchange_code_for_token(self, code: str, redirect_uri: str, request: HttpRequest) -> dict:
         """Exchange the auth code for an access token.
 
         Args:
@@ -525,9 +511,7 @@ class RedditOAuth2Provider(OAuth2Provider):
         }
 
         auth = HTTPBasicAuth(self.config["client_id"], self.config["client_secret"])
-        response = requests.post(
-            self.token_url, data=data, auth=auth, headers=headers, timeout=10
-        )
+        response = requests.post(self.token_url, data=data, auth=auth, headers=headers, timeout=10)
 
         return response.json()
 
@@ -559,6 +543,81 @@ class RedditOAuth2Provider(OAuth2Provider):
         return f"{self.authorize_url}?{urlencode(params)}"
 
 
+class PinterestOAuth2Provider(OAuth2Provider):
+    """Pinterest OAuth2 provider."""
+
+    @property
+    def authorize_url(self) -> str:
+        """The URL to authorize the user."""
+        return "https://www.pinterest.com/oauth/"
+
+    @property
+    def token_url(self) -> str:
+        """The URL to exchange the code for a token."""
+        return "https://api.pinterest.com/v5/oauth/token"
+
+    @property
+    def user_info_url(self) -> str:
+        """The URL to get the user info."""
+        return "https://api.pinterest.com/v5/user_account"
+
+    def get_user_info(self, access_token: str) -> dict:
+        """Get the user info from Pinterest.
+
+        Args:
+            access_token (str): The access token.
+
+        Returns:
+            dict: The user info.
+
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(self.user_info_url, headers=headers, timeout=10)
+        user_data = response.json()
+
+        # Ensure we have the expected structure including id and name fields
+        if "id" not in user_data and "username" in user_data:
+            user_data["id"] = user_data["username"]
+
+        # Set name if not present
+        if "name" not in user_data or not user_data["name"]:
+            user_data["name"] = user_data.get("username", "Pinterest User")
+
+        logger.debug("Pinterest user info: %s", user_data)
+        return user_data
+
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
+        """Exchange the auth code for an access token.
+
+        Args:
+            code (str): The code.
+            redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
+
+        Returns:
+            dict: The token data.
+
+        """
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect_uri,
+        }
+
+        # Pinterest uses HTTP Basic auth for client authentication
+        auth = HTTPBasicAuth(self.config["client_id"], self.config["client_secret"])
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        response = requests.post(self.token_url, data=data, auth=auth, headers=headers, timeout=10)
+
+        return response.json()
+
+
 class OAuth2ProviderFactory:
     """Factory class to get the OAuth2 provider."""
 
@@ -578,6 +637,7 @@ class OAuth2ProviderFactory:
             "linkedin": LinkedInOAuth2Provider,
             "github": GitHubOAuth2Provider,
             "reddit": RedditOAuth2Provider,
+            "pinterest": PinterestOAuth2Provider,
         }
         provider_class = providers.get(provider_name)
         if not provider_class:
