@@ -1,3 +1,9 @@
+## 0.3.0 (2025-05-10)
+
+### Feat
+
+- **pinterest**: added pinterest as a provider
+
 ## 0.2.0 (2025-05-09)
 
 ### Feat
