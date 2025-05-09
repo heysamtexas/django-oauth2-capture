@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "oauth2_capture"
-version = "0.1.8"
+version = "0.2.0"
 authors = [{name = "Sam Texas", email = "github+oauth2_capture@simplecto.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -80,7 +80,7 @@ exclude = [
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.8"
+version = "0.2.0"
 tag_format = "$version"
 bump_message = "bump: version $current_version → $new_version"
 update_changelog_on_bump = true
