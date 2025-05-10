@@ -181,4 +181,9 @@ OAUTH2_CONFIG = {
         "client_secret": os.environ["FACEBOOK_CLIENT_SECRET"],
         "scope": "email public_profile pages_show_list pages_manage_posts business_management",
     },
+    "threads": {
+        "client_id": os.environ["THREADS_CLIENT_ID"],
+        "client_secret": os.environ["THREADS_CLIENT_SECRET"],
+        "scope": "threads_basic threads_content_publish",
+    },
 }
