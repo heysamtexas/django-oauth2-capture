@@ -1,7 +1,21 @@
 # OAuth2 Token Capture for Django
 
-This Django package that enables easy capture of OAuth2 tokens from various
-providers like X (Twitter), LinkedIn, and GitHub.
+This Django package that enables easy capture of OAuth2 tokens for the following
+providers:
+
+- X (Twitter)
+- LinkedIn
+- GitHub
+- Reddit
+- Pinterest
+- Facebook
+- Threads
+
+## Planned
+
+- Instagram
+- Youtube
+- TikTok
 
 ---
 
@@ -11,8 +25,13 @@ providers like X (Twitter), LinkedIn, and GitHub.
 - User information retrieval
 - Support for multiple providers
 - Easily extendable to support new providers
+- Manage multiple tokens for different users and providers
 
 ---
+
+
+https://youtube.com/@leftsideresale?si=b7Be0pEbJGA57Y7J
+
 
 ## Requirements
 
@@ -231,3 +250,4 @@ Setup each provider by following the instructions in the `docs/` folder.
 - [GitHub](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps)
 - [Reddit](https://github.com/reddit-archive/reddit/wiki/OAuth2)
 - [Pinterest](https://developers.pinterest.com/docs/getting-started/connect-app/)
+- [Facebook](https://developers.facebook.com/docs/facebook-login/web)

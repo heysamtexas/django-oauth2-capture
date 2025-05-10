@@ -176,4 +176,9 @@ OAUTH2_CONFIG = {
         "client_secret": os.environ["PINTEREST_CLIENT_SECRET"],
         "scope": "user_accounts:read boards:read_secret boards:read boards:write_secret boards:write pins:read pins:write pins:read_secret pins:write_secret",
     },
+    "facebook": {
+        "client_id": os.environ["FACEBOOK_CLIENT_ID"],
+        "client_secret": os.environ["FACEBOOK_CLIENT_SECRET"],
+        "scope": "email public_profile pages_show_list pages_manage_posts business_management",
+    },
 }

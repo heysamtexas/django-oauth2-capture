@@ -204,7 +204,7 @@ class OAuth2Provider(ABC):
             oauth_token.refresh_token_expires_at = timezone.now() + timedelta(
                 seconds=token_data["refresh_token_expires_in"]
             )
-        oauth_token.scope = token_data.get("scope")
+        oauth_token.scope = token_data.get("scope", self.config["scope"])
         oauth_token.token_type = token_data.get("token_type")
 
         # Update the user info
@@ -618,6 +618,76 @@ class PinterestOAuth2Provider(OAuth2Provider):
         return response.json()
 
 
+class FacebookOAuth2Provider(OAuth2Provider):
+    """Facebook OAuth2 provider."""
+
+    @property
+    def authorize_url(self) -> str:
+        """The URL to authorize the user."""
+        return "https://www.facebook.com/v19.0/dialog/oauth"
+
+    @property
+    def token_url(self) -> str:
+        """The URL to exchange the code for a token."""
+        return "https://graph.facebook.com/v19.0/oauth/access_token"
+
+    @property
+    def user_info_url(self) -> str:
+        """The URL to get the user info."""
+        return "https://graph.facebook.com/v19.0/me"
+
+    def get_user_info(self, access_token: str) -> dict:
+        """Get the user info from Facebook.
+
+        Args:
+            access_token (str): The access token.
+
+        Returns:
+            dict: The user info.
+
+        """
+        params = {
+            "fields": "id,name,email,picture",
+            "access_token": access_token,
+        }
+        response = requests.get(self.user_info_url, params=params, timeout=10)
+        user_data = response.json()
+
+        # Ensure proper structure
+        if "picture" in user_data and "data" in user_data["picture"]:
+            user_data["profile_image_url"] = user_data["picture"]["data"]["url"]
+
+        logger.debug("Facebook user info: %s", user_data)
+        return user_data
+
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
+        """Exchange the auth code for an access token.
+
+        Args:
+            code (str): The code.
+            redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
+
+        Returns:
+            dict: The token data.
+
+        """
+        params = {
+            "client_id": self.config["client_id"],
+            "client_secret": self.config["client_secret"],
+            "code": code,
+            "redirect_uri": redirect_uri,
+        }
+
+        response = requests.get(self.token_url, params=params, timeout=10)
+        return response.json()
+
+
 class OAuth2ProviderFactory:
     """Factory class to get the OAuth2 provider."""
 
@@ -638,6 +708,7 @@ class OAuth2ProviderFactory:
             "github": GitHubOAuth2Provider,
             "reddit": RedditOAuth2Provider,
             "pinterest": PinterestOAuth2Provider,
+            "facebook": FacebookOAuth2Provider,
         }
         provider_class = providers.get(provider_name)
         if not provider_class:
