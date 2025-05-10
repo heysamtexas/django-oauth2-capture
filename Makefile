@@ -14,16 +14,16 @@ bootstrap: .venv/
 
 .PHONY: prerelease
 prerelease: ## Run checks before releasing
-	$(ENV_DIR)/bin/ruff --config pyproject.toml check .
+	ruff --config pyproject.toml check .
 	# Add any other pre-release checks here
 	@echo "Pre-release checks passed! Ready to run 'make release'"
 
 .PHONY: release
 release: ## Create a new release with commitizen and push to GitHub
-	$(ENV_DIR)/bin/cz bump --yes
+	cz bump --yes
 	git push
 	git push --tags
 
 .PHONY: release-dry-run
 release-dry-run: ## Show what version would be bumped to
-	$(ENV_DIR)/bin/cz bump --dry-run
+	cz bump --dry-run
