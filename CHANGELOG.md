@@ -1,3 +1,13 @@
+## 0.4.0 (2025-05-10)
+
+### Feat
+
+- **facebook**: added capture for facebook
+
+### Fix
+
+- **refresh_token**: fix the refresh token flow, added 429 retries and reddit posting
+
 ## 0.3.0 (2025-05-10)
 
 ### Feat
