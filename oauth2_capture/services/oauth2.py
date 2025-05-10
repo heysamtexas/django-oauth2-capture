@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import base64
+import contextlib
 import hashlib
 import logging
 import secrets
+import time
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from typing import TYPE_CHECKING
@@ -15,6 +17,8 @@ from django.utils import timezone
 from requests.auth import HTTPBasicAuth
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from django.http import HttpRequest
 
     from oauth2_capture.models import OAuthToken
@@ -48,6 +52,36 @@ def generate_code_challenge(verifier: str) -> str:
     """
     sha256 = hashlib.sha256(verifier.encode("utf-8")).digest()
     return base64.urlsafe_b64encode(sha256).decode("utf-8").rstrip("=")
+
+
+def retry_with_backoff(
+    request_func: Callable[[], requests.Response], max_retries: int = 5, fallback_delays: tuple = (5, 10, 20, 40, 60)
+) -> requests.Response:
+    """Retry a request with exponential backoff.
+
+    Args:
+        request_func (Callable): The function to call for the request.
+        max_retries (int): The maximum number of retries.
+        fallback_delays (tuple): The fallback delays in seconds.
+
+    Returns:
+        requests.Response: The response from the request.
+
+    """
+    for attempt in range(max_retries):
+        response = request_func()
+        if response.status_code != 429:  # noqa: PLR2004
+            return response
+        retry_after = response.headers.get("Retry-After")
+
+        delay = fallback_delays[min(attempt, len(fallback_delays) - 1)]
+
+        if retry_after:
+            with contextlib.suppress(ValueError):
+                delay = int(retry_after)
+
+        time.sleep(delay)
+    return response  # Return last response after max retries
 
 
 class OAuth2Provider(ABC):
@@ -155,7 +189,14 @@ class OAuth2Provider(ABC):
             "Authorization": f"Basic {encoded_credentials}",
             "Content-Type": "application/x-www-form-urlencoded",
         }
-        response = requests.post(self.token_url, data=data, headers=headers, timeout=10)
+
+        def do_request() -> requests.Response:
+            return requests.post(self.token_url, data=data, headers=headers, timeout=10)
+
+        response = retry_with_backoff(do_request)
+        if response.status_code != 200:  # noqa: PLR2004
+            logger.error("Token refresh failed: %s - %s", response.status_code, response.text)
+            return {}
         return response.json()
 
     def get_valid_token(self, oauth_token: OAuthToken) -> str | None:
@@ -168,15 +209,30 @@ class OAuth2Provider(ABC):
             str|None: The access token or None if there is no token.
 
         """
-        if oauth_token.expires_at <= timezone.now():
+        if oauth_token.expires_at and oauth_token.expires_at <= timezone.now():
             msg = f"Token for {oauth_token.provider}:{oauth_token.name} has expired. Refreshing..."
             logger.debug(msg)
             token_data = self.refresh_token(oauth_token.refresh_token)
-            self.update_token(
-                oauth_token=oauth_token,
-                token_data=token_data,
-                user_info=self.get_user_info(token_data["access_token"]),
-            )
+
+            # Check if the refresh was successful
+            if not token_data or "access_token" not in token_data:
+                logger.error(
+                    "Failed to refresh token for %s:%s. Response: %s",
+                    oauth_token.provider,
+                    oauth_token.name,
+                    token_data,
+                )
+                return None
+
+            try:
+                self.update_token(
+                    oauth_token=oauth_token,
+                    token_data=token_data,
+                    user_info=self.get_user_info(token_data["access_token"]),
+                )
+            except Exception:
+                logger.exception("Error updating token for %s:%s.", oauth_token.provider, oauth_token.name)
+                return None
 
         logger.debug("Token for %s:%s is valid", oauth_token.provider, oauth_token.name)
         return oauth_token.access_token
@@ -507,11 +563,46 @@ class RedditOAuth2Provider(OAuth2Provider):
             "client_secret": self.config["client_secret"],
         }
         headers = {
-            "User-Agent": "AgentsAsylum/1.0 by simplecto",
+            "User-Agent": "Oauth2Capture/1.0 by simplecto",
         }
 
         auth = HTTPBasicAuth(self.config["client_id"], self.config["client_secret"])
         response = requests.post(self.token_url, data=data, auth=auth, headers=headers, timeout=10)
+
+        return response.json()
+
+    def refresh_token(self, refresh_token: str) -> dict:
+        """Refresh the Reddit access token.
+
+        Reddit requires HTTP Basic Auth with the client_id and client_secret
+        *only* in the Authorization header plus a custom User-Agent on *every*
+        request. Supplying client credentials in the POST body can trigger a
+        403, so we keep the body minimal.
+
+        Args:
+            refresh_token (str): The stored refresh token.
+
+        Returns:
+            dict: The token response data, or an empty dict on failure.
+
+        """
+        data = {
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+        }
+
+        # Reddit mandates Basic Auth for confidential apps
+        auth = HTTPBasicAuth(self.config["client_id"], self.config["client_secret"])
+        headers = {
+            "User-Agent": "Oauth2Capture/1.0 by simplecto",
+        }
+
+        response = requests.post(self.token_url, data=data, auth=auth, headers=headers, timeout=10)
+
+        # Log useful info for debugging
+        if response.status_code != 200:  # noqa: PLR2004
+            logger.error("Reddit refresh failed: %s - %s", response.status_code, response.text)
+            return {}
 
         return response.json()
 
