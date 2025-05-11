@@ -29,8 +29,43 @@ providers:
 
 ---
 
+## 📌 How is oauth2_capture different from django-allauth?
 
-https://youtube.com/@leftsideresale?si=b7Be0pEbJGA57Y7J
+Many Django developers are familiar with django-allauth, which is a comprehensive authentication solution. Here's how oauth2_capture differs:
+
+|                    | **django-allauth**                                  | **oauth2_capture**                                      |
+|--------------------|-----------------------------------------------------|----------------------------------------------------------|
+| **Primary purpose**| User authentication and account creation            | Token capture and API integration                        |
+| **Main use case**  | "Let users log into your site with social accounts" | "Let your app post to users' social accounts and access APIs on their behalf" |
+| **Focus**          | Creating and managing Django user objects           | Capturing, storing, and refreshing OAuth tokens for API access |
+| **Token usage**    | Mainly used for authentication verification         | Intended for ongoing API operations on behalf of users   |
+| **Architecture**   | Comprehensive auth system with social login         | Lean, focused package for OAuth2 token management        |
+
+### When to use oauth2_capture
+
+Choose oauth2_capture when your application needs to:
+
+- Post to social media platforms on behalf of users
+- Access provider APIs (GitHub, LinkedIn, etc.) using user permissions
+- Perform actions that require fresh OAuth tokens with specific scopes
+- Maintain long-term API access with automatic token refreshing
+
+### When to use django-allauth
+
+Choose django-allauth when you primarily need:
+
+- Social authentication for user login
+- User registration and management
+- Email verification workflows
+- Account linking between social providers
+
+### Can they be used together?
+
+Absolutely! You can use django-allauth for user authentication and oauth2_capture for API interactions. They solve different problems and complement each other well.
+
+Simply put: **django-allauth manages users, oauth2_capture manages tokens**.
+
+---
 
 
 ## Requirements
