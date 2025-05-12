@@ -1,4 +1,4 @@
-Django==5.1.7
+Django==5.2.1
 requests~=2.32.3
 shortuuid==1.0.13
 django-environ
