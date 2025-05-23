@@ -694,7 +694,7 @@ class ThreadsOAuth2Provider(OAuth2Provider):
     @property
     def authorize_url(self) -> str:
         """The URL to authorize the user."""
-        return "https://threads.net/oauth/authorize"
+        return "https://www.threads.com/oauth/authorize"
 
     @property
     def token_url(self) -> str:
