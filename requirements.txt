@@ -1,4 +1,9 @@
+<<<<<<< dependabot/pip/requests-approx-eq-2.32.4
+Django==5.1.7
+requests~=2.32.4
+=======
 Django==5.2.3
 requests~=2.32.3
+>>>>>>> master
 shortuuid==1.0.13
 django-environ
