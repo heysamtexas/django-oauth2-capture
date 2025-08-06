@@ -1,3 +1,9 @@
+## 0.5.1 (2025-08-06)
+
+### Fix
+
+- relax Django version constraint from ==5.2.3 to >=4.2
+
 ## 0.5.0 (2025-08-06)
 
 ### Feat
