@@ -8,20 +8,20 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: pypi
+      url: https://pypi.org/p/oauth2-capture
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
     - name: Install uv
       uses: astral-sh/setup-uv@v5
-    - name: Install dependencies
-      run: uv sync
-    - name: Build and publish
-      env:
-        FLIT_USERNAME: __token__
-        FLIT_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: |
-        uv run flit publish
+    - name: Build package
+      run: uv build
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

@@ -8,7 +8,7 @@ bootstrap: ## Setup development environment with uv
 
 .PHONY: prerelease
 prerelease: ## Run checks before releasing
-	ruff --config pyproject.toml check .
+	uv run ruff check .
 	# Add any other pre-release checks here
 	@echo "Pre-release checks passed! Ready to run 'make release'"
 

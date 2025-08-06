@@ -1,6 +1,6 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "oauth2_capture"
@@ -33,7 +33,6 @@ dependencies = [
 dev = [
     "ruff==0.12.1",
     "pre-commit==4.2.0",
-    "flit==3.12.0",
     "coverage[toml]~=7.4.0",
 ]
 
