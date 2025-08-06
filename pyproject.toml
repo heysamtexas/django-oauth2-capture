@@ -24,7 +24,7 @@ description = "Capture and store OAuth2 tokens for later use."
 dependencies = [
     "requests~=2.32.4",
     "shortuuid==1.0.13",
-    "Django==5.2.3",
+    "Django>=4.2",
     "django-environ"
 ]
 
@@ -38,10 +38,10 @@ dev = [
 
 
 [project.urls]
-Home = "https://github.com/heysamtexas/oauth2_capture"
-Documentation = "https://github.com/heysamtexas/oauth2_capture#readme"
-Source = "https://github.com/heysamtexas/oauth2_capture"
-Issues = "https://github.com/heysamtexas/oauth2_capture/issues"
+Home = "https://github.com/heysamtexas/django-oauth2-capture"
+Documentation = "https://github.com/heysamtexas/django-oauth2-capture#readme"
+Source = "https://github.com/heysamtexas/django-oauth2-capture"
+Issues = "https://github.com/heysamtexas/django-oauth2-capture#readme/issues"
 
 
 [tool.ruff]
