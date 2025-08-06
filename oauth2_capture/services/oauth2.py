@@ -16,6 +16,8 @@ from django.conf import settings
 from django.utils import timezone
 from requests.auth import HTTPBasicAuth
 
+from oauth2_capture.exceptions import TokenRefreshError
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -216,13 +218,13 @@ class OAuth2Provider(ABC):
 
             # Check if the refresh was successful
             if not token_data or "access_token" not in token_data:
-                logger.error(
-                    "Failed to refresh token for %s:%s. Response: %s",
-                    oauth_token.provider,
-                    oauth_token.name,
-                    token_data,
+                error_msg = f"Failed to refresh token for {oauth_token.provider}:{oauth_token.name}"
+                logger.error("%s. Response: %s", error_msg, token_data)
+                raise TokenRefreshError(
+                    f"Token refresh failed for {oauth_token.provider}. "
+                    "Re-authorization may be required.",
+                    provider=oauth_token.provider
                 )
-                return None
 
             try:
                 self.update_token(
@@ -230,9 +232,12 @@ class OAuth2Provider(ABC):
                     token_data=token_data,
                     user_info=self.get_user_info(token_data["access_token"]),
                 )
-            except Exception:
+            except Exception as e:
                 logger.exception("Error updating token for %s:%s.", oauth_token.provider, oauth_token.name)
-                return None
+                raise TokenRefreshError(
+                    f"Error updating refreshed token for {oauth_token.provider}: {str(e)}",
+                    provider=oauth_token.provider
+                ) from e
 
         logger.debug("Token for %s:%s is valid", oauth_token.provider, oauth_token.name)
         return oauth_token.access_token
@@ -261,7 +266,7 @@ class OAuth2Provider(ABC):
                 seconds=token_data["refresh_token_expires_in"]
             )
         oauth_token.scope = token_data.get("scope", self.config["scope"])
-        oauth_token.token_type = token_data.get("token_type")
+        oauth_token.token_type = token_data.get("token_type", oauth_token.token_type or "Bearer")
 
         # Update the user info
         oauth_token.profile_json = user_info

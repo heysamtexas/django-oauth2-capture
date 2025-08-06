@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from demo.services import post_to_twitter, publish_to_linkedin
+from oauth2_capture.exceptions import TokenRefreshError
 from oauth2_capture.models import OAuthToken
 from oauth2_capture.services.oauth2 import OAuth2ProviderFactory
 
@@ -58,7 +59,22 @@ def reddit_post(token: str, oauth_token: str) -> tuple:  # noqa: ARG001
 def social_post(request: HttpRequest, provider: str, slug: str) -> HttpResponse:
     """Handle social media posts for different providers."""
     token = get_object_or_404(OAuthToken, slug=slug)
-    oa2 = OAuth2ProviderFactory.get_provider(provider).get_valid_token(token)
+    
+    # Try to get a valid token - handle refresh failures gracefully
+    try:
+        oa2 = OAuth2ProviderFactory.get_provider(provider).get_valid_token(token)
+    except TokenRefreshError as e:
+        messages.warning(
+            request, 
+            f"Your {provider.title()} connection has expired. Please reconnect to continue posting."
+        )
+        logger.warning(f"Token refresh failed for {provider}: {e}")
+        return render(request, "reauth_needed.html", {
+            "provider": provider,
+            "provider_title": provider.title(),
+            "token": token,
+            "error_message": str(e)
+        })
 
     # Look up the appropriate function using naming convention
     post_function_name = f"{provider}_post"

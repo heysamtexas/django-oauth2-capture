@@ -30,7 +30,33 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     except ValueError as e:
         return HttpResponse(str(e), status=400)
 
+    # Verify OAuth state parameter to prevent CSRF attacks
+    received_state = request.GET.get("state")
+    session_state_key = f"{provider}_oauth_state"
+    stored_state = request.session.get(session_state_key)
+    
+    if not received_state or not stored_state or received_state != stored_state:
+        logger.warning(
+            f"OAuth state verification failed for {provider}. "
+            f"Received: {received_state}, Expected: {stored_state}"
+        )
+        return HttpResponse("Invalid OAuth state. Possible CSRF attack.", status=400)
+    
+    # Clear the state from session after successful verification
+    del request.session[session_state_key]
+
+    # Check if user denied authorization
+    error = request.GET.get("error")
+    if error:
+        error_description = request.GET.get("error_description", "Authorization denied by user")
+        logger.info(f"OAuth authorization denied for {provider}: {error_description}")
+        return HttpResponse(f"Authorization denied: {error_description}", status=400)
+
     code = request.GET.get("code")
+    if not code:
+        logger.error(f"No authorization code received for {provider}")
+        return HttpResponse("No authorization code received from provider", status=400)
+        
     redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
 
     token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri, request)

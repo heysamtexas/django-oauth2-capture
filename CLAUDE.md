@@ -9,9 +9,9 @@ This is `oauth2_capture`, a Django package for capturing and managing OAuth2 tok
 ## Development Environment Setup
 
 ### Core Commands
-**Note**: uv automatically manages the virtual environment
+**Note**: uv automatically manages the virtual environment. Always run uv commands from the project root directory where pyproject.toml is located.
 
-- `uv sync --dev` - Install package and all dependencies in development mode
+- `uv sync --dev` - Install package and all dependencies in development mode (run from project root)
 - `cd development && python manage.py migrate` - Run database migrations
 - `cd development && python manage.py runserver` - Start development server
 - `cd development && python manage.py createsuperuser` - Create admin user
@@ -27,7 +27,17 @@ This is `oauth2_capture`, a Django package for capturing and managing OAuth2 tok
 - `ruff check .` - Run linting (configured in pyproject.toml)
 - `make prerelease` - Run pre-release checks including linting
 - Tests are located in `oauth2_capture/tests/` and individual app test files
-- **IMPORTANT**: Always use Django's test suite (`cd development && python manage.py test`), NEVER use pytest
+- **IMPORTANT**: Always use Django's test suite (`uv run python manage.py test`), NEVER use pytest
+
+### Code Coverage
+**Note**: Coverage commands must be run from project root directory where pyproject.toml is located
+
+- `uv sync --dev` - Install coverage dependency (run from project root first)
+- `uv run coverage run development/manage.py test` - Run tests with coverage measurement
+- `uv run coverage report` - Show coverage report in terminal
+- `uv run coverage html` - Generate HTML coverage report (opens in `htmlcov/index.html`)
+- `uv run coverage json` - Generate JSON coverage report for programmatic analysis
+- Coverage configuration is in `pyproject.toml` under `[tool.coverage.*]`
 
 ### Release Management
 - `make release-dry-run` - Preview version bump

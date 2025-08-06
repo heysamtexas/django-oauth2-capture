@@ -34,6 +34,7 @@ dev = [
     "ruff==0.12.1",
     "pre-commit==4.2.0",
     "flit==3.12.0",
+    "coverage[toml]~=7.4.0",
 ]
 
 
@@ -77,6 +78,38 @@ exclude = [
     ".idea/**",
     "development/manage.py",
 ]
+
+[tool.coverage.run]
+source = ["oauth2_capture"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*", 
+    "*/venv/*",
+    "development/manage.py",
+    "development/*/settings.py",
+    "development/*/wsgi.py",
+    "development/*/asgi.py",
+    "*/__pycache__/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:"
+]
+show_missing = true
+skip_covered = false
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.json]
+output = "coverage.json"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
