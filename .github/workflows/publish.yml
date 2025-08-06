@@ -15,13 +15,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flit
+      run: uv sync
     - name: Build and publish
       env:
         FLIT_USERNAME: __token__
         FLIT_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        flit publish
+        uv run flit publish

@@ -1,107 +1,59 @@
-# OAuth2 Token Capture for Django
+# OAuth2 Capture for Django
 
-This Django package that enables easy capture of OAuth2 tokens for the following
-providers:
+**Store and manage OAuth2 tokens for ongoing API access to social media platforms.**
 
-- X (Twitter)
-- LinkedIn
-- GitHub
-- Reddit
-- Pinterest
-- Facebook
-- Threads
+Your Django app needs to post tweets for users. Your CRM creates GitHub repos in client organizations. Your marketing tool schedules LinkedIn posts for customers.
 
-## Planned
+This package captures and manages the OAuth2 tokens that make these use cases possible.
 
-- Instagram
-- Youtube
-- TikTok
+## Who This Is For
 
----
+✅ **Building social media management tools**
+✅ **Creating GitHub integrations that act on behalf of users**
+✅ **Need ongoing API access, not just authentication**
 
-## Features
+❌ **Just want social login for your Django app** → Use [django-allauth](https://github.com/pennersr/django-allauth) instead
 
-- OAuth2 token exchange
-- User information retrieval
-- Support for multiple providers
-- Easily extendable to support new providers
-- Manage multiple tokens for different users and providers
+## Supported Providers
+
+- **Twitter/X** - Post tweets, read timelines, manage accounts
+- **LinkedIn** - Share posts, manage company pages, access connections
+- **GitHub** - Create repos, manage issues, access organization data
+- **Reddit** - Post content, read feeds, manage subreddits
+- **Pinterest** - Create pins, manage boards
+- **Facebook** - Publish posts, manage pages (limited by Facebook policies)
+
+*Planned: Instagram, YouTube, TikTok*
 
 ---
 
-## 📌 How is oauth2_capture different from django-allauth?
+## What This Package Does vs django-allauth
 
-Many Django developers are familiar with django-allauth, which is a comprehensive authentication solution. Here's how oauth2_capture differs:
+**oauth2_capture** solves: *"I need my app to post tweets/LinkedIn updates FOR my users"*
+- Your app posts to Twitter using Jane's account
+- Your app creates GitHub repos in John's organizations
+- Your app schedules LinkedIn posts for your marketing clients
 
-|                    | **django-allauth**                                  | **oauth2_capture**                                      |
-|--------------------|-----------------------------------------------------|----------------------------------------------------------|
-| **Primary purpose**| User authentication and account creation            | Token capture and API integration                        |
-| **Main use case**  | "Let users log into your site with social accounts" | "Let your app post to users' social accounts and access APIs on their behalf" |
-| **Focus**          | Creating and managing Django user objects           | Capturing, storing, and refreshing OAuth tokens for API access |
-| **Token usage**    | Mainly used for authentication verification         | Intended for ongoing API operations on behalf of users   |
-| **Architecture**   | Comprehensive auth system with social login         | Lean, focused package for OAuth2 token management        |
+**django-allauth** solves: *"I need users to log into my site with social accounts"*
+- Users click "Login with Google" to access your Django app
+- You create user profiles from their social account data
+- You manage user sessions and permissions
 
-### When to use oauth2_capture
-
-Choose oauth2_capture when your application needs to:
-
-- Post to social media platforms on behalf of users
-- Access provider APIs (GitHub, LinkedIn, etc.) using user permissions
-- Perform actions that require fresh OAuth tokens with specific scopes
-- Maintain long-term API access with automatic token refreshing
-
-### When to use django-allauth
-
-Choose django-allauth when you primarily need:
-
-- Social authentication for user login
-- User registration and management
-- Email verification workflows
-- Account linking between social providers
-
-### Can they be used together?
-
-Absolutely! You can use django-allauth for user authentication and oauth2_capture for API interactions. They solve different problems and complement each other well.
-
-Simply put: **django-allauth manages users, oauth2_capture manages tokens**.
+**Can you use both?** Yes! allauth for login, oauth2_capture for API actions.
 
 ---
 
 
-## Requirements
+## Quick Start (5 minutes)
 
-- Python 3.6+
-- Django 3.0+
-- requests
-
-You will also need to setup an OAuth2 application with each provider you want to
-use. This will give you a client ID and client secret that you will need to
-configure the package.
-
----
-
-## Installation
-
-Install the package using pip:
+### 1. Install
 
 ```bash
-pip install oauth2_capture
-```
-or while in development mode:
-```bash
-pip install -e .
+uv add git+https://github.com/heysamtexas/django-oauth2-capture.git@master
 ```
 
-or from another project, make sure to follow HEAD on master from https://github.com/heysamtexas/django-oauth2-capture:
+### 2. Add to Django Settings
 
-```bash
-pip install git+https://github.com/yourusername/django-oauth2-capture.git@master
-```
-
----
-
-## Configuration
-Add it to your installed apps in your Django settings file:
 ```python
 INSTALLED_APPS = [
     ...
@@ -110,69 +62,99 @@ INSTALLED_APPS = [
 ]
 ```
 
----
+### 3. Run Migrations
 
-## OAuth2 Configuration
+```bash
+python manage.py migrate
+```
 
-You need to configure the OAuth2 providers in your Django settings file by adding the `OAUTH2_CONFIG` dictionary. Each provider requires specific configuration parameters:
+### 4. Add URLs
 
 ```python
-OAUTH2_CONFIG = {
-    "twitter": {
-        "client_id": os.environ["TWITTER_CLIENT_ID"],
-        "client_secret": os.environ["TWITTER_CLIENT_SECRET"],
-        "scope": "tweet.read users.read tweet.write offline.access",
-        "code_verifier": "challenge",  # Twitter-specific parameter
-    },
-    "linkedin": {
-        "client_id": os.environ["LINKEDIN_CLIENT_ID"],
-        "client_secret": os.environ["LINKEDIN_CLIENT_SECRET"],
-        "scope": "profile email openid w_member_social",
-    },
-    "github": {
-        "client_id": os.environ["GITHUB_CLIENT_ID"],
-        "client_secret": os.environ["GITHUB_CLIENT_SECRET"],
-        "scope": "user repo issues write:discussion",
-    },
-    "reddit": {
-        "client_id": os.environ["REDDIT_CLIENT_ID"],
-        "client_secret": os.environ["REDDIT_CLIENT_SECRET"],
-        "scope": "identity edit read submit save",
-    },
-    "pinterest": {
-        "client_id": os.environ["PINTEREST_CLIENT_ID"],
-        "client_secret": os.environ["PINTEREST_CLIENT_SECRET"],
-        "scope": "user_accounts:read boards:read_secret boards:read boards:write_secret boards:write pins:read pins:write pins:read_secret pins:write_secret",
-    },
-}
+# urls.py
+from django.urls import path, include
+
+urlpatterns = [
+    ...
+    path('oauth2/', include('oauth2_capture.urls')),
+    ...
+]
 ```
+
+### 5. Verify Setup
+
+```bash
+python manage.py check oauth2_capture
+```
+**Expected output**: "System check identified no issues"
+
+**If error**: Check INSTALLED_APPS includes 'oauth2_capture'
+
+---
+
+## Provider Setup
+
+Choose a provider to get started. Each requires different setup steps and credentials.
+
+### Twitter (Recommended for beginners)
+
+1. Create app at [developer.twitter.com](https://developer.twitter.com)
+2. Copy Client ID and Secret
+3. Add to settings:
+   ```python
+   OAUTH2_CONFIG = {
+       "twitter": {
+           "client_id": "your_twitter_client_id",
+           "client_secret": "your_twitter_client_secret",
+           "scope": "tweet.read users.read tweet.write offline.access",
+           "code_verifier": "challenge",  # Required for Twitter
+       }
+   }
+   ```
+4. **Test**: Visit `/oauth2/twitter/connect/` - should redirect to Twitter
+
+### GitHub (For development tools)
+
+1. Go to GitHub Settings → Developer settings → OAuth Apps
+2. Create new OAuth App with redirect URI: `http://localhost:8000/oauth2/github/callback/`
+3. Add to settings:
+   ```python
+   OAUTH2_CONFIG = {
+       "github": {
+           "client_id": "your_github_client_id",
+           "client_secret": "your_github_client_secret",
+           "scope": "user repo",  # Minimal scopes to start
+       }
+   }
+   ```
+
+### LinkedIn (For business applications)
+
+1. Create app at [LinkedIn Developer Portal](https://developer.linkedin.com/)
+2. Request necessary permissions (may require approval)
+3. Add to settings:
+   ```python
+   OAUTH2_CONFIG = {
+       "linkedin": {
+           "client_id": "your_linkedin_client_id",
+           "client_secret": "your_linkedin_client_secret",
+           "scope": "profile email openid w_member_social",
+       }
+   }
+   ```
 
 ---
 
 ## Usage
 
-The package provides views and models to handle OAuth2 authentication and token storage. Here's a basic implementation:
-
-1. Include the OAuth2 URLs in your project's `urls.py`:
-
-```python
-from django.urls import include, path
-
-urlpatterns = [
-    # ... your other URL patterns
-    path('oauth2/', include('oauth2_capture.urls')),
-]
-```
-2. Create links to the OAuth2 authorization endpoints for your desired providers:
+### 1. Create Connection Links
 
 ```html
-<a href="{% url 'oauth2_capture:authorize' 'github' %}">Connect with GitHub</a>
-<a href="{% url 'oauth2_capture:authorize' 'twitter' %}">Connect with Twitter</a>
-<a href="{% url 'oauth2_capture:authorize' 'linkedin' %}">Connect with LinkedIn</a>
-<!-- Add more providers as needed -->
+<a href="{% url 'oauth2_capture:initiate_oauth2' 'twitter' %}">Connect Twitter</a>
+<a href="{% url 'oauth2_capture:initiate_oauth2' 'github' %}">Connect GitHub</a>
 ```
 
-3. Handle the callback and access the tokens in your views:
+### 2. Access Tokens in Your Views
 
 ```python
 from oauth2_capture.models import OAuth2Token
@@ -180,7 +162,7 @@ from oauth2_capture.models import OAuth2Token
 def my_view(request):
     # Get a user's GitHub token
     token = OAuth2Token.objects.filter(
-        user=request.user,
+        owner=request.user,
         provider='github'
     ).first()
 
