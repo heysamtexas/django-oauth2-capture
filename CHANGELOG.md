@@ -1,3 +1,9 @@
+## 0.5.0 (2025-08-06)
+
+### Feat
+
+- migrate from flit to hatchling with trusted publishing
+
 ## 0.4.0 (2025-05-10)
 
 ### Feat
