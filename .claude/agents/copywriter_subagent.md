@@ -90,7 +90,11 @@ Structure complex procedures as decision trees:
    - If X is true → Go to step 3
    - If X is false → Go to step 2
 2. Resolve X by doing Y
+<<<<<<< HEAD
    - Success → Go to step 3  
+=======
+   - Success → Go to step 3
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
    - Failure → STOP and report error Z
 3. Continue with main procedure...
 ```
@@ -141,7 +145,11 @@ Run these commands to verify successful installation:
 - Error "file not found" → Verify prerequisites, restart from step 1
 ```
 
+<<<<<<< HEAD
 #### API Documentation Template  
+=======
+#### API Documentation Template
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 ```markdown
 ## API Endpoint Documentation
 

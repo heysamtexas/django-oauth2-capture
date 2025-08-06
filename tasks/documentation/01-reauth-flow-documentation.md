@@ -7,7 +7,11 @@ Create comprehensive documentation explaining how the oauth2_capture library han
 Currently, there is limited documentation about what happens when OAuth tokens expire or become invalid. From our conversation, the maintainer mentioned:
 
 > "there are issues of token refresh and re-auth workflows because eventually the oauth tokens expire and the user must reauthorize with the provider"
+<<<<<<< HEAD
 > 
+=======
+>
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 > "I believe we message them and place them into a re-auth flow, but i dont remember. (we should document this)"
 
 **Documentation Gaps:**
@@ -129,6 +133,7 @@ Re-authentication is required when `get_valid_token()` returns `None`:
 def get_twitter_token(user):
     """Get valid Twitter token or None if re-auth needed."""
     token = OAuthToken.objects.filter(provider='twitter', owner=user).first()
+<<<<<<< HEAD
     
     if not token:
         return None  # No token exists - initial auth needed
@@ -136,6 +141,15 @@ def get_twitter_token(user):
     provider = OAuth2ProviderFactory.get_provider('twitter')
     access_token = provider.get_valid_token(token)
     
+=======
+
+    if not token:
+        return None  # No token exists - initial auth needed
+
+    provider = OAuth2ProviderFactory.get_provider('twitter')
+    access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return access_token  # Valid token or None if re-auth needed
 
 # Usage
@@ -153,6 +167,7 @@ from oauth2_capture.exceptions import TokenExpiredError, TokenRevokedError
 def check_token_status(user, provider_name):
     """Check token status with detailed error information."""
     token = OAuthToken.objects.filter(provider=provider_name, owner=user).first()
+<<<<<<< HEAD
     
     if not token:
         return {'status': 'no_token', 'action': 'initial_auth'}
@@ -161,11 +176,25 @@ def check_token_status(user, provider_name):
         provider = OAuth2ProviderFactory.get_provider(provider_name)
         access_token = provider.get_valid_token(token)
         
+=======
+
+    if not token:
+        return {'status': 'no_token', 'action': 'initial_auth'}
+
+    try:
+        provider = OAuth2ProviderFactory.get_provider(provider_name)
+        access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if access_token:
             return {'status': 'valid', 'token': access_token}
         else:
             return {'status': 'refresh_failed', 'action': 'reauth'}
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     except TokenExpiredError:
         return {'status': 'expired', 'action': 'reauth', 'reason': 'expired_refresh_token'}
     except TokenRevokedError:
@@ -195,6 +224,7 @@ def require_oauth_token(provider_name, redirect_url=None):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             token = OAuthToken.objects.filter(
+<<<<<<< HEAD
                 provider=provider_name, 
                 owner=request.user
             ).first()
@@ -217,6 +247,30 @@ def require_oauth_token(provider_name, redirect_url=None):
             request.oauth_token = access_token
             return view_func(request, *args, **kwargs)
         
+=======
+                provider=provider_name,
+                owner=request.user
+            ).first()
+
+            if not token:
+                messages.info(request, f'Please connect your {provider_name.title()} account')
+                return redirect(redirect_url or f'/oauth2/{provider_name}/authorize/')
+
+            provider = OAuth2ProviderFactory.get_provider(provider_name)
+            access_token = provider.get_valid_token(token)
+
+            if not access_token:
+                messages.warning(
+                    request,
+                    f'Your {provider_name.title()} connection has expired. Please reconnect.'
+                )
+                return redirect(redirect_url or f'/oauth2/{provider_name}/authorize/')
+
+            # Add token to request for use in view
+            request.oauth_token = access_token
+            return view_func(request, *args, **kwargs)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return wrapper
     return decorator
 
@@ -233,10 +287,17 @@ def post_to_twitter(request):
 ```python
 class SocialMediaService:
     """Service for social media operations with re-auth handling."""
+<<<<<<< HEAD
     
     def __init__(self, user):
         self.user = user
     
+=======
+
+    def __init__(self, user):
+        self.user = user
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def post_to_provider(self, provider_name, content):
         """Post content to provider with automatic re-auth detection."""
         try:
@@ -248,17 +309,26 @@ class SocialMediaService:
                     'reauth_url': f'/oauth2/{provider_name}/authorize/',
                     'message': f'Please reconnect your {provider_name.title()} account'
                 }
+<<<<<<< HEAD
             
             # Proceed with posting
             result = self._perform_post(provider_name, token, content)
             return {'success': True, 'result': result}
             
+=======
+
+            # Proceed with posting
+            result = self._perform_post(provider_name, token, content)
+            return {'success': True, 'result': result}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception as e:
             return {
                 'success': False,
                 'error': 'api_error',
                 'message': str(e)
             }
+<<<<<<< HEAD
     
     def _get_valid_token(self, provider_name):
         """Get valid token or None if re-auth needed."""
@@ -273,6 +343,22 @@ class SocialMediaService:
         provider = OAuth2ProviderFactory.get_provider(provider_name)
         return provider.get_valid_token(token)
     
+=======
+
+    def _get_valid_token(self, provider_name):
+        """Get valid token or None if re-auth needed."""
+        token = OAuthToken.objects.filter(
+            provider=provider_name,
+            owner=self.user
+        ).first()
+
+        if not token:
+            return None
+
+        provider = OAuth2ProviderFactory.get_provider(provider_name)
+        return provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _perform_post(self, provider_name, token, content):
         """Perform the actual post operation."""
         # Implementation depends on provider
@@ -282,7 +368,11 @@ class SocialMediaService:
 def social_post_view(request):
     service = SocialMediaService(request.user)
     result = service.post_to_provider('twitter', 'Hello world!')
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if not result['success']:
         if result['error'] == 'reauth_required':
             return redirect(result['reauth_url'])
@@ -290,7 +380,11 @@ def social_post_view(request):
             messages.error(request, result['message'])
     else:
         messages.success(request, 'Posted successfully!')
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return redirect('/')
 ```
 
@@ -301,31 +395,55 @@ from django.utils.deprecation import MiddlewareMixin
 
 class OAuth2ReauthMiddleware(MiddlewareMixin):
     """Middleware to add OAuth token status to all requests."""
+<<<<<<< HEAD
     
     def process_request(self, request):
         if request.user.is_authenticated:
             request.oauth_status = self._check_all_tokens(request.user)
     
+=======
+
+    def process_request(self, request):
+        if request.user.is_authenticated:
+            request.oauth_status = self._check_all_tokens(request.user)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _check_all_tokens(self, user):
         """Check status of all user's OAuth tokens."""
         tokens = OAuthToken.objects.filter(owner=user)
         status = {}
+<<<<<<< HEAD
         
         for token in tokens:
             provider = OAuth2ProviderFactory.get_provider(token.provider)
             access_token = provider.get_valid_token(token)
             
+=======
+
+        for token in tokens:
+            provider = OAuth2ProviderFactory.get_provider(token.provider)
+            access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             status[token.provider] = {
                 'valid': access_token is not None,
                 'reauth_url': f'/oauth2/{token.provider}/authorize/' if not access_token else None
             }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return status
 
 # Usage in templates
 {% if request.oauth_status.twitter and not request.oauth_status.twitter.valid %}
     <div class="alert alert-warning">
+<<<<<<< HEAD
         Your Twitter connection has expired. 
+=======
+        Your Twitter connection has expired.
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         <a href="{{ request.oauth_status.twitter.reauth_url }}">Reconnect</a>
     </div>
 {% endif %}
@@ -337,11 +455,19 @@ class OAuth2ReauthMiddleware(MiddlewareMixin):
 
 ```python
 # Good: Specific, actionable messages
+<<<<<<< HEAD
 messages.warning(request, 
     'Your Twitter connection has expired. Click here to reconnect and continue posting.'
 )
 
 # Bad: Generic, unclear messages  
+=======
+messages.warning(request,
+    'Your Twitter connection has expired. Click here to reconnect and continue posting.'
+)
+
+# Bad: Generic, unclear messages
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 messages.error(request, 'Authentication failed')
 ```
 
@@ -350,30 +476,50 @@ messages.error(request, 'Authentication failed')
 ```python
 def handle_reauth_needed(request, provider, original_action):
     """Handle re-auth with context about what user was trying to do."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Store the original action in session
     request.session['pending_action'] = {
         'type': original_action,
         'provider': provider,
         'timestamp': timezone.now().isoformat()
     }
+<<<<<<< HEAD
     
     messages.info(request, 
         f'To {original_action}, please reconnect your {provider.title()} account.'
     )
     
+=======
+
+    messages.info(request,
+        f'To {original_action}, please reconnect your {provider.title()} account.'
+    )
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return redirect(f'/oauth2/{provider}/authorize/')
 
 def oauth_callback_with_context(request, provider):
     """OAuth callback that handles pending actions."""
+<<<<<<< HEAD
     
     # Handle normal OAuth callback
     response = oauth2_callback(request, provider)
     
+=======
+
+    # Handle normal OAuth callback
+    response = oauth2_callback(request, provider)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Check for pending actions
     pending = request.session.get('pending_action')
     if pending and pending['provider'] == provider:
         del request.session['pending_action']
+<<<<<<< HEAD
         
         messages.success(request, 
             f'{provider.title()} reconnected! You can now {pending["type"]}.'
@@ -382,6 +528,16 @@ def oauth_callback_with_context(request, provider):
         # Redirect to original action or appropriate page
         return redirect('/')
     
+=======
+
+        messages.success(request,
+            f'{provider.title()} reconnected! You can now {pending["type"]}.'
+        )
+
+        # Redirect to original action or appropriate page
+        return redirect('/')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return response
 ```
 
@@ -390,28 +546,48 @@ def oauth_callback_with_context(request, provider):
 ```python
 def dashboard_view(request):
     """Dashboard that shows token status proactively."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if request.user.is_authenticated:
         # Check all tokens and warn about upcoming expirations
         tokens = OAuthToken.objects.filter(owner=request.user)
         warnings = []
+<<<<<<< HEAD
         
         for token in tokens:
             if token.expires_at:
                 time_until_expiry = token.expires_at - timezone.now()
                 
+=======
+
+        for token in tokens:
+            if token.expires_at:
+                time_until_expiry = token.expires_at - timezone.now()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 if time_until_expiry < timedelta(days=7):
                     warnings.append({
                         'provider': token.provider,
                         'expires_in_days': time_until_expiry.days,
                         'reauth_url': f'/oauth2/{token.provider}/authorize/'
                     })
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if warnings:
             context = {'token_warnings': warnings}
         else:
             context = {}
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'dashboard.html', context)
 ```
 
@@ -422,14 +598,22 @@ def dashboard_view(request):
 - **Common Re-auth Triggers**: User changes password, account suspension
 - **Rate Limiting**: May affect refresh attempts
 
+<<<<<<< HEAD
 ### GitHub  
+=======
+### GitHub
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - **Token Expiration**: Tokens don't expire by default for OAuth apps
 - **Re-auth Triggers**: User revokes app access, org policies change
 - **Scope Changes**: New permissions require re-authorization
 
 ### LinkedIn
 - **Token Lifetime**: 60 days by default
+<<<<<<< HEAD
 - **Refresh Behavior**: Automatic refresh extends lifetime  
+=======
+- **Refresh Behavior**: Automatic refresh extends lifetime
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - **Re-auth Triggers**: Membership changes, privacy settings
 
 ### Reddit
@@ -450,11 +634,19 @@ def dashboard_view(request):
 
 ```python
 class ReauthFlowTests(TestCase):
+<<<<<<< HEAD
     
     def test_expired_token_triggers_reauth(self):
         """Test that expired tokens trigger re-authentication."""
         user = User.objects.create_user('testuser')
         
+=======
+
+    def test_expired_token_triggers_reauth(self):
+        """Test that expired tokens trigger re-authentication."""
+        user = User.objects.create_user('testuser')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Create expired token
         expired_token = OAuthToken.objects.create(
             provider='twitter',
@@ -463,6 +655,7 @@ class ReauthFlowTests(TestCase):
             access_token='expired_token',
             expires_at=timezone.now() - timedelta(hours=1)
         )
+<<<<<<< HEAD
         
         provider = OAuth2ProviderFactory.get_provider('twitter')
         
@@ -471,6 +664,16 @@ class ReauthFlowTests(TestCase):
             
             result = provider.get_valid_token(expired_token)
             
+=======
+
+        provider = OAuth2ProviderFactory.get_provider('twitter')
+
+        with patch.object(provider, 'refresh_token') as mock_refresh:
+            mock_refresh.return_value = {}  # Empty response = failed refresh
+
+            result = provider.get_valid_token(expired_token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             self.assertIsNone(result)
             mock_refresh.assert_called_once()
 ```
@@ -485,7 +688,11 @@ class ReauthFlowTests(TestCase):
 **Cause**: Messages not displayed in template
 **Solution**: Ensure messages framework is properly configured
 
+<<<<<<< HEAD
 ### Issue: Re-auth Required After Each Request  
+=======
+### Issue: Re-auth Required After Each Request
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 **Cause**: Token refresh failing silently
 **Solution**: Enable debug logging, check provider credentials
 
@@ -530,11 +737,16 @@ from oauth2_capture.services.oauth2 import OAuth2ProviderFactory
 def needs_reauth(user, provider_name):
     """
     Check if user needs to re-authenticate with a provider.
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     Returns:
         bool: True if re-authentication is needed, False if token is valid
     """
     token = OAuthToken.objects.filter(provider=provider_name, owner=user).first()
+<<<<<<< HEAD
     
     if not token:
         return True  # No token exists
@@ -542,6 +754,15 @@ def needs_reauth(user, provider_name):
     provider = OAuth2ProviderFactory.get_provider(provider_name)
     access_token = provider.get_valid_token(token)
     
+=======
+
+    if not token:
+        return True  # No token exists
+
+    provider = OAuth2ProviderFactory.get_provider(provider_name)
+    access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return access_token is None
 
 # Example 2: View decorator for required OAuth tokens
@@ -555,7 +776,11 @@ def oauth_required(provider_name, redirect_to=None):
         def wrapper(request, *args, **kwargs):
             if not request.user.is_authenticated:
                 return redirect('login')
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if needs_reauth(request.user, provider_name):
                 messages.warning(
                     request,
@@ -563,7 +788,11 @@ def oauth_required(provider_name, redirect_to=None):
                 )
                 redirect_url = redirect_to or f'/oauth2/{provider_name}/authorize/'
                 return redirect(redirect_url)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             return view_func(request, *args, **kwargs)
         return wrapper
     return decorator
@@ -571,6 +800,7 @@ def oauth_required(provider_name, redirect_to=None):
 # Example 3: Service class with comprehensive error handling
 class SocialPostingService:
     """Service for posting to social media with re-auth handling."""
+<<<<<<< HEAD
     
     def __init__(self, user):
         self.user = user
@@ -579,12 +809,26 @@ class SocialPostingService:
         """
         Post content to a social media provider.
         
+=======
+
+    def __init__(self, user):
+        self.user = user
+
+    def post_content(self, provider_name, content):
+        """
+        Post content to a social media provider.
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         Returns dict with success status and any required actions.
         """
         try:
             # Get valid token
             token_result = self._get_token_status(provider_name)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if not token_result['valid']:
                 return {
                     'success': False,
@@ -592,36 +836,62 @@ class SocialPostingService:
                     'reauth_url': f'/oauth2/{provider_name}/authorize/',
                     'message': token_result['message']
                 }
+<<<<<<< HEAD
             
             # Simulate posting (replace with actual API calls)
             post_result = self._make_api_post(provider_name, token_result['token'], content)
             
+=======
+
+            # Simulate posting (replace with actual API calls)
+            post_result = self._make_api_post(provider_name, token_result['token'], content)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             return {
                 'success': True,
                 'post_id': post_result['id'],
                 'message': f'Successfully posted to {provider_name.title()}'
             }
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception as e:
             return {
                 'success': False,
                 'action_required': 'retry',
                 'message': f'Error posting to {provider_name}: {str(e)}'
             }
+<<<<<<< HEAD
     
     def _get_token_status(self, provider_name):
         """Get detailed token status."""
         token = OAuthToken.objects.filter(provider=provider_name, owner=self.user).first()
         
+=======
+
+    def _get_token_status(self, provider_name):
+        """Get detailed token status."""
+        token = OAuthToken.objects.filter(provider=provider_name, owner=self.user).first()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if not token:
             return {
                 'valid': False,
                 'message': f'No {provider_name.title()} account connected'
             }
+<<<<<<< HEAD
         
         provider = OAuth2ProviderFactory.get_provider(provider_name)
         access_token = provider.get_valid_token(token)
         
+=======
+
+        provider = OAuth2ProviderFactory.get_provider(provider_name)
+        access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if access_token:
             return {
                 'valid': True,
@@ -632,7 +902,11 @@ class SocialPostingService:
                 'valid': False,
                 'message': f'{provider_name.title()} connection expired'
             }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _make_api_post(self, provider_name, token, content):
         """Make actual API post (implement per provider)."""
         # This would contain provider-specific API calls
@@ -645,10 +919,17 @@ def post_to_social(request):
     if request.method == 'POST':
         provider = request.POST.get('provider')
         content = request.POST.get('content')
+<<<<<<< HEAD
         
         service = SocialPostingService(request.user)
         result = service.post_content(provider, content)
         
+=======
+
+        service = SocialPostingService(request.user)
+        result = service.post_content(provider, content)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if result['success']:
             messages.success(request, result['message'])
         else:
@@ -662,7 +943,11 @@ def post_to_social(request):
                 return redirect(result['reauth_url'])
             else:
                 messages.error(request, result['message'])
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'social_post.html')
 
 @login_required
@@ -671,6 +956,7 @@ def oauth_callback_handler(request, provider):
     # First, handle the normal OAuth callback
     from oauth2_capture.views import oauth2_callback
     response = oauth2_callback(request, provider)
+<<<<<<< HEAD
     
     # If callback was successful, check for pending actions
     if response.status_code == 200 and 'pending_post' in request.session:
@@ -684,17 +970,37 @@ def oauth_callback_handler(request, provider):
             service = SocialPostingService(request.user)
             result = service.post_content(provider, pending['content'])
             
+=======
+
+    # If callback was successful, check for pending actions
+    if response.status_code == 200 and 'pending_post' in request.session:
+        pending = request.session['pending_post']
+
+        if pending['provider'] == provider:
+            # Remove from session
+            del request.session['pending_post']
+
+            # Retry the original post
+            service = SocialPostingService(request.user)
+            result = service.post_content(provider, pending['content'])
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if result['success']:
                 messages.success(request, f"Connected and posted: {result['message']}")
             else:
                 messages.warning(request, f"Connected but posting failed: {result['message']}")
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return response
 
 # Example 5: Proactive token health checking
 @login_required
 def dashboard_view(request):
     """Dashboard view with proactive token health monitoring."""
+<<<<<<< HEAD
     
     token_status = {}
     expiring_soon = []
@@ -706,28 +1012,57 @@ def dashboard_view(request):
         provider = OAuth2ProviderFactory.get_provider(token.provider)
         access_token = provider.get_valid_token(token)
         
+=======
+
+    token_status = {}
+    expiring_soon = []
+
+    # Check all user's tokens
+    tokens = OAuthToken.objects.filter(owner=request.user)
+
+    for token in tokens:
+        provider = OAuth2ProviderFactory.get_provider(token.provider)
+        access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         is_valid = access_token is not None
         token_status[token.provider] = {
             'valid': is_valid,
             'reauth_url': f'/oauth2/{token.provider}/authorize/'
         }
+<<<<<<< HEAD
         
         # Check for upcoming expiration (if token has expiry)
         if token.expires_at and is_valid:
             time_until_expiry = token.expires_at - timezone.now()
             
+=======
+
+        # Check for upcoming expiration (if token has expiry)
+        if token.expires_at and is_valid:
+            time_until_expiry = token.expires_at - timezone.now()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if time_until_expiry < timedelta(days=7):
                 expiring_soon.append({
                     'provider': token.provider,
                     'days_remaining': max(0, time_until_expiry.days),
                     'reauth_url': f'/oauth2/{token.provider}/authorize/'
                 })
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     context = {
         'token_status': token_status,
         'expiring_soon': expiring_soon
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'dashboard.html', context)
 
 # Example 6: Bulk operation with re-auth handling
@@ -737,6 +1072,7 @@ def bulk_social_post(request):
     if request.method == 'POST':
         content = request.POST.get('content')
         selected_providers = request.POST.getlist('providers')
+<<<<<<< HEAD
         
         service = SocialPostingService(request.user)
         results = {}
@@ -746,11 +1082,23 @@ def bulk_social_post(request):
             result = service.post_content(provider, content)
             results[provider] = result
             
+=======
+
+        service = SocialPostingService(request.user)
+        results = {}
+        reauth_needed = []
+
+        for provider in selected_providers:
+            result = service.post_content(provider, content)
+            results[provider] = result
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if not result['success'] and result['action_required'] == 'reauth':
                 reauth_needed.append({
                     'provider': provider,
                     'url': result['reauth_url']
                 })
+<<<<<<< HEAD
         
         # Handle results
         successful_posts = [p for p, r in results.items() if r['success']]
@@ -762,12 +1110,26 @@ def bulk_social_post(request):
         if failed_posts:
             messages.error(request, f"Failed to post to: {', '.join(failed_posts)}")
         
+=======
+
+        # Handle results
+        successful_posts = [p for p, r in results.items() if r['success']]
+        failed_posts = [p for p, r in results.items() if not r['success'] and r['action_required'] != 'reauth']
+
+        if successful_posts:
+            messages.success(request, f"Posted to: {', '.join(successful_posts)}")
+
+        if failed_posts:
+            messages.error(request, f"Failed to post to: {', '.join(failed_posts)}")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if reauth_needed:
             # Store bulk post info for after re-auth
             request.session['pending_bulk_post'] = {
                 'content': content,
                 'providers': [item['provider'] for item in reauth_needed]
             }
+<<<<<<< HEAD
             
             messages.warning(
                 request, 
@@ -777,11 +1139,23 @@ def bulk_social_post(request):
             # Redirect to first provider that needs re-auth
             return redirect(reauth_needed[0]['url'])
     
+=======
+
+            messages.warning(
+                request,
+                f"Please reconnect: {', '.join([item['provider'] for item in reauth_needed])}"
+            )
+
+            # Redirect to first provider that needs re-auth
+            return redirect(reauth_needed[0]['url'])
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'bulk_post.html')
 
 # Example 7: Middleware for global token status
 class TokenHealthMiddleware:
     """Middleware that adds token health info to all requests."""
+<<<<<<< HEAD
     
     def __init__(self, get_response):
         self.get_response = get_response
@@ -793,36 +1167,69 @@ class TokenHealthMiddleware:
         response = self.get_response(request)
         return response
     
+=======
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            request.oauth_health = self._check_token_health(request.user)
+
+        response = self.get_response(request)
+        return response
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _check_token_health(self, user):
         """Check health of all user tokens."""
         tokens = OAuthToken.objects.filter(owner=user)
         health = {'providers': {}, 'alerts': []}
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         for token in tokens:
             try:
                 provider = OAuth2ProviderFactory.get_provider(token.provider)
                 access_token = provider.get_valid_token(token)
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 is_healthy = access_token is not None
                 health['providers'][token.provider] = {
                     'healthy': is_healthy,
                     'reauth_url': f'/oauth2/{token.provider}/authorize/' if not is_healthy else None
                 }
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 if not is_healthy:
                     health['alerts'].append({
                         'type': 'reauth_needed',
                         'provider': token.provider,
                         'message': f'{token.provider.title()} connection needs renewal'
                     })
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             except Exception as e:
                 health['providers'][token.provider] = {
                     'healthy': False,
                     'error': str(e),
                     'reauth_url': f'/oauth2/{token.provider}/authorize/'
                 }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return health
 ```
 
@@ -834,4 +1241,8 @@ class TokenHealthMiddleware:
 - [ ] User experience best practices
 - [ ] Testing strategies for re-auth flows
 - [ ] Troubleshooting guide for common issues
+<<<<<<< HEAD
 - [ ] Integration examples with Django features
+=======
+- [ ] Integration examples with Django features
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

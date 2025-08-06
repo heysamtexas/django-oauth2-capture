@@ -22,7 +22,11 @@ Current error handling in `oauth2_capture/views.py` has several issues:
 ### Error Response Structure
 Create a structured error response format that includes:
 - Specific error codes
+<<<<<<< HEAD
 - Human-readable messages  
+=======
+- Human-readable messages
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - Technical details for debugging
 - Suggested actions for resolution
 
@@ -74,15 +78,24 @@ import json
 
 class ErrorResponse:
     """Structured error response helper."""
+<<<<<<< HEAD
     
     def __init__(self, error_code: str, message: str, details: str = None, 
+=======
+
+    def __init__(self, error_code: str, message: str, details: str = None,
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                  status_code: int = 400, suggested_action: str = None):
         self.error_code = error_code
         self.message = message
         self.details = details
         self.status_code = status_code
         self.suggested_action = suggested_action
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def as_json(self) -> JsonResponse:
         """Return error as JSON response."""
         data = {
@@ -92,14 +105,24 @@ class ErrorResponse:
                 'status_code': self.status_code
             }
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if self.details:
             data['error']['details'] = self.details
         if self.suggested_action:
             data['error']['suggested_action'] = self.suggested_action
+<<<<<<< HEAD
             
         return JsonResponse(data, status=self.status_code)
     
+=======
+
+        return JsonResponse(data, status=self.status_code)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def as_html(self, request) -> HttpResponse:
         """Return error as HTML response."""
         context = {
@@ -109,10 +132,17 @@ class ErrorResponse:
             'suggested_action': self.suggested_action,
             'status_code': self.status_code
         }
+<<<<<<< HEAD
         
         html = render_to_string('oauth2_capture/error.html', context, request)
         return HttpResponse(html, status=self.status_code)
     
+=======
+
+        html = render_to_string('oauth2_capture/error.html', context, request)
+        return HttpResponse(html, status=self.status_code)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def auto_response(self, request):
         """Return appropriate response type based on request."""
         if request.headers.get('Accept', '').startswith('application/json'):
@@ -128,35 +158,59 @@ class OAuth2Errors:
         status_code=404,
         suggested_action='Check the provider name and ensure it is configured'
     )
+<<<<<<< HEAD
     
     INVALID_STATE = ErrorResponse(
         error_code='INVALID_OAUTH_STATE', 
+=======
+
+    INVALID_STATE = ErrorResponse(
+        error_code='INVALID_OAUTH_STATE',
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         message='OAuth state verification failed',
         status_code=400,
         suggested_action='Please restart the OAuth flow'
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     MISSING_AUTH_CODE = ErrorResponse(
         error_code='MISSING_AUTH_CODE',
         message='Authorization code not provided',
         status_code=400,
         suggested_action='Please complete the OAuth authorization flow'
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_EXCHANGE_FAILED = ErrorResponse(
         error_code='TOKEN_EXCHANGE_FAILED',
         message='Failed to exchange authorization code for access token',
         status_code=502,
         suggested_action='Please try connecting your account again'
     )
+<<<<<<< HEAD
     
     PROVIDER_API_ERROR = ErrorResponse(
         error_code='PROVIDER_API_ERROR', 
+=======
+
+    PROVIDER_API_ERROR = ErrorResponse(
+        error_code='PROVIDER_API_ERROR',
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         message='Unable to communicate with OAuth provider',
         status_code=502,
         suggested_action='The service may be temporarily unavailable. Please try again later'
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     CONFIGURATION_ERROR = ErrorResponse(
         error_code='CONFIGURATION_ERROR',
         message='OAuth provider not properly configured',
@@ -169,7 +223,11 @@ class OAuth2Errors:
 ```python
 def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     """Finalize the Oauth2 flow with comprehensive error handling."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Validate provider
     try:
         oauth2_provider = OAuth2ProviderFactory.get_provider(provider)
@@ -177,26 +235,45 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
         error = OAuth2Errors.UNSUPPORTED_PROVIDER
         error.details = f"Provider '{provider}' is not supported"
         return error.auto_response(request)
+<<<<<<< HEAD
     
     # Validate state (from previous security task)
     callback_state = request.GET.get("state")
     session_state = request.session.get(f"{provider}_oauth_state")
     
+=======
+
+    # Validate state (from previous security task)
+    callback_state = request.GET.get("state")
+    session_state = request.session.get(f"{provider}_oauth_state")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if not callback_state or callback_state != session_state:
         error = OAuth2Errors.INVALID_STATE
         error.details = "OAuth state parameter missing or invalid"
         return error.auto_response(request)
+<<<<<<< HEAD
     
     # Clean up session state
     request.session.pop(f"{provider}_oauth_state", None)
     
+=======
+
+    # Clean up session state
+    request.session.pop(f"{provider}_oauth_state", None)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Validate authorization code
     code = request.GET.get("code")
     if not code:
         error = OAuth2Errors.MISSING_AUTH_CODE
         error.details = "OAuth provider did not return an authorization code"
         return error.auto_response(request)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Handle provider errors in callback
     error_param = request.GET.get("error")
     if error_param:
@@ -209,10 +286,17 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
             suggested_action="Please try connecting your account again"
         )
         return error.auto_response(request)
+<<<<<<< HEAD
     
     # Exchange code for token
     redirect_uri = request.build_absolute_uri(f"/oauth2/{provider}/callback/")
     
+=======
+
+    # Exchange code for token
+    redirect_uri = request.build_absolute_uri(f"/oauth2/{provider}/callback/")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     try:
         token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri, request)
     except requests.RequestException as e:
@@ -225,7 +309,11 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
         error.details = f"Unexpected error during token exchange: {str(e)}"
         logger.exception("Token exchange error for %s", provider)
         return error.auto_response(request)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Validate token response
     access_token = token_data.get("access_token")
     if not access_token:
@@ -233,34 +321,57 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
         error.details = f"Provider response: {token_data}"
         logger.error("No access token in response for %s: %s", provider, token_data)
         return error.auto_response(request)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Get user info
     try:
         user_info = oauth2_provider.get_user_info(access_token)
     except requests.RequestException as e:
+<<<<<<< HEAD
         error = OAuth2Errors.PROVIDER_API_ERROR  
         error.details = f"Failed to fetch user information: {str(e)}"
         return error.auto_response(request)
     
+=======
+        error = OAuth2Errors.PROVIDER_API_ERROR
+        error.details = f"Failed to fetch user information: {str(e)}"
+        return error.auto_response(request)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Save token
     try:
         oauth_token, created = OAuthToken.objects.get_or_create(
             provider=provider,
+<<<<<<< HEAD
             user_id=user_info.get("id"), 
+=======
+            user_id=user_info.get("id"),
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             owner=request.user,
         )
         oauth2_provider.update_token(oauth_token, token_data, user_info)
     except Exception as e:
         error = ErrorResponse(
             error_code='TOKEN_SAVE_ERROR',
+<<<<<<< HEAD
             message='Failed to save OAuth token', 
+=======
+            message='Failed to save OAuth token',
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             details=str(e),
             status_code=500,
             suggested_action='Please try connecting your account again'
         )
         logger.exception("Failed to save token for %s", provider)
         return error.auto_response(request)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Success response
     if request.headers.get('Accept', '').startswith('application/json'):
         return JsonResponse({
@@ -275,7 +386,11 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
 
 def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
     """Initiate OAuth2 flow with better error handling."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Validate provider
     try:
         oauth2_provider = OAuth2ProviderFactory.get_provider(provider)
@@ -283,7 +398,11 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
         error = OAuth2Errors.UNSUPPORTED_PROVIDER
         error.details = f"Provider '{provider}' is not supported or not configured"
         return error.auto_response(request)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Validate configuration
     try:
         state = secrets.token_urlsafe(32)
@@ -304,10 +423,17 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
         )
         logger.exception("Failed to generate auth URL for %s", provider)
         return error.auto_response(request)
+<<<<<<< HEAD
     
     # Store state and redirect
     request.session[f"{provider}_oauth_state"] = state
     
+=======
+
+    # Store state and redirect
+    request.session[f"{provider}_oauth_state"] = state
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     logger.info("Initiating OAuth flow for %s user %s", provider, request.user.id)
     return redirect(auth_url)
 ```
@@ -331,24 +457,39 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
 <body>
     <div class="error-container">
         <h1>Connection Error</h1>
+<<<<<<< HEAD
         
         <div class="error-code">Error Code: {{ error_code }}</div>
         <div class="error-message">{{ message }}</div>
         
+=======
+
+        <div class="error-code">Error Code: {{ error_code }}</div>
+        <div class="error-message">{{ message }}</div>
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         {% if details %}
         <div class="error-details">
             <strong>Details:</strong><br>
             {{ details }}
         </div>
         {% endif %}
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         {% if suggested_action %}
         <div class="suggested-action">
             <strong>What you can do:</strong><br>
             {{ suggested_action }}
         </div>
         {% endif %}
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         <div class="back-link">
             <a href="/">← Back to Home</a>
         </div>
@@ -359,9 +500,17 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
 
 ## Success Criteria
 - [ ] Structured error responses with specific error codes
+<<<<<<< HEAD
 - [ ] Appropriate HTTP status codes for different error types  
+=======
+- [ ] Appropriate HTTP status codes for different error types
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - [ ] Human-readable error messages with actionable guidance
 - [ ] Support for both JSON and HTML error responses
 - [ ] Comprehensive error logging for debugging
 - [ ] Backward compatibility with existing error handling expectations
+<<<<<<< HEAD
 - [ ] Full test coverage for all error scenarios
+=======
+- [ ] Full test coverage for all error scenarios
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

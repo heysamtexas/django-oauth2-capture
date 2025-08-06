@@ -64,26 +64,43 @@ exclude = [
 # overlap with the use of a formatter, like Black, but we can override this behavior by
 # explicitly adding the rule.
 ignore = [
-    "E501",
-    "D203",
-    "D213",
-    "D100",
-    "COM812"
+    "E501",      # Line too long (handled by formatter)
+    "D203",      # One blank line required before class docstring
+    "D213",      # Multi-line docstring summary should start at the second line
+    "D100",      # Missing docstring in public module
+    "COM812",    # Trailing comma missing (handled by formatter)
+    "G004",      # Logging statement uses f-string (f-strings are fine for readability)
+    "TRY003",    # Avoid specifying long messages outside exception class (pedantic)
+    "EM102",     # Exception must not use f-string literal (f-strings are readable)
 ]
 select = ["ALL", "W2", "I"]
-exclude = [
-    "pyproject.toml",
-    "*/**/tests/**",
-    "*/**/migrations/**",
-    ".idea/**",
-    "development/manage.py",
+
+[tool.ruff.lint.per-file-ignores]
+# Relaxed rules for test files - focus on functionality over pedantic style
+"**/tests.py" = [
+    "S106",      # Possible hardcoded password (test credentials are expected)
+    "ANN",       # Type annotations (less critical in tests)
+    "PT009",     # Use assert instead of unittest-style (allow unittest patterns)
+    "D",         # All docstring requirements (tests are often self-documenting)
+    "ARG001",    # Unused function argument (common in test mocks)
+    "ARG002",    # Unused method argument (common in test mocks)
+    "S101",      # Use of assert (pytest uses asserts)
+]
+"**/test_*.py" = [
+    "S106", "ANN", "PT009", "D", "ARG001", "ARG002", "S101"
+]
+"**/tests/**/*.py" = [
+    "S106", "ANN", "PT009", "D", "ARG001", "ARG002", "S101"
+]
+"development/demo/tests.py" = [
+    "S106", "ANN", "PT009", "D", "ARG001", "ARG002", "S101"
 ]
 
 [tool.coverage.run]
 source = ["oauth2_capture"]
 omit = [
     "*/migrations/*",
-    "*/tests/*", 
+    "*/tests/*",
     "*/venv/*",
     "development/manage.py",
     "development/*/settings.py",

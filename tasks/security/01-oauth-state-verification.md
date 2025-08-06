@@ -15,7 +15,11 @@ The OAuth2 specification requires state verification to prevent cross-site reque
 
 ### Implementation Steps
 1. **Extract state from callback**: Get state parameter from `request.GET.get("state")`
+<<<<<<< HEAD
 2. **Retrieve stored state**: Get `request.session.get(f"{provider}_oauth_state")`  
+=======
+2. **Retrieve stored state**: Get `request.session.get(f"{provider}_oauth_state")`
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 3. **Verify match**: Compare the two values
 4. **Clear session**: Remove stored state after verification
 5. **Handle mismatches**: Return appropriate error response
@@ -47,15 +51,24 @@ Simple (1-2 hours)
 ```python
 def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     """Finalize the Oauth2 flow with proper state verification."""
+<<<<<<< HEAD
     
     # Extract state from callback
     callback_state = request.GET.get("state")
     session_state = request.session.get(f"{provider}_oauth_state")
     
+=======
+
+    # Extract state from callback
+    callback_state = request.GET.get("state")
+    session_state = request.session.get(f"{provider}_oauth_state")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Verify state parameter
     if not callback_state or not session_state:
         logger.warning("OAuth callback missing state parameter for provider %s", provider)
         return HttpResponse("Invalid OAuth state - missing parameter", status=400)
+<<<<<<< HEAD
     
     if callback_state != session_state:
         logger.warning("OAuth state mismatch for provider %s", provider) 
@@ -64,12 +77,26 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     # Clear the state from session
     request.session.pop(f"{provider}_oauth_state", None)
     
+=======
+
+    if callback_state != session_state:
+        logger.warning("OAuth state mismatch for provider %s", provider)
+        return HttpResponse("Invalid OAuth state - verification failed", status=400)
+
+    # Clear the state from session
+    request.session.pop(f"{provider}_oauth_state", None)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Continue with existing token exchange logic...
     try:
         oauth2_provider = OAuth2ProviderFactory.get_provider(provider)
     except ValueError as e:
         return HttpResponse(str(e), status=400)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # ... rest of existing code
 ```
 
@@ -79,4 +106,8 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
 - [ ] Appropriate error responses for invalid/missing state
 - [ ] Session state is cleaned up after verification
 - [ ] Comprehensive test coverage for all scenarios
+<<<<<<< HEAD
 - [ ] No regression in existing OAuth flows
+=======
+- [ ] No regression in existing OAuth flows
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

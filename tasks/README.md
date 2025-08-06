@@ -14,7 +14,11 @@ This directory contains detailed task specifications for improving the oauth2_ca
 #### 🔒 Security (`security/`) - HIGH PRIORITY
 Essential security fixes for safe OAuth2 token handling:
 - OAuth state verification (CSRF protection)
+<<<<<<< HEAD
 - Token refresh error handling 
+=======
+- Token refresh error handling
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - Token validation helpers
 - Better error responses
 
@@ -61,7 +65,11 @@ Other tasks or external requirements that must be completed first.
 
 ## Estimated Complexity
 - Simple: 1-2 hours
+<<<<<<< HEAD
 - Medium: Half day to full day  
+=======
+- Medium: Half day to full day
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - Complex: Multiple days
 
 ## Files to Modify
@@ -97,4 +105,8 @@ Everything else is likely scope creep. When in doubt, **don't build it**.
 - **Architecture**: Provider pattern with abstract base class for extensibility
 - **Django Version**: 5.1+, Python 3.12+
 
+<<<<<<< HEAD
 For full architectural context, see the main [CLAUDE.md](../CLAUDE.md) file.
+=======
+For full architectural context, see the main [CLAUDE.md](../CLAUDE.md) file.
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

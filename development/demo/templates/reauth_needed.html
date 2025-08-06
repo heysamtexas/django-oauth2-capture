@@ -5,31 +5,53 @@
 {% block content %}
 <div style="max-width: 600px; margin: 2rem auto; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
     <h1 style="color: #e67e22; margin-bottom: 1rem;">🔄 Reconnection Required</h1>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     <div style="margin-bottom: 2rem;">
         <p style="font-size: 1.1em; margin-bottom: 1rem;">
             Your <strong>{{ provider_title }}</strong> connection has expired and needs to be refreshed.
         </p>
+<<<<<<< HEAD
         
         <p style="color: #666; margin-bottom: 1rem;">
             This happens when your access token expires or when you revoke permissions. 
             Don't worry - this is normal and easy to fix!
         </p>
         
+=======
+
+        <p style="color: #666; margin-bottom: 1rem;">
+            This happens when your access token expires or when you revoke permissions.
+            Don't worry - this is normal and easy to fix!
+        </p>
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
             <strong>What happened:</strong> {{ error_message }}
         </div>
     </div>
 
     <div style="text-align: center; margin-bottom: 2rem;">
+<<<<<<< HEAD
         <a href="/oauth2/{{ provider }}/connect/" 
            style="display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; 
+=======
+        <a href="/oauth2/{{ provider }}/connect/"
+           style="display: inline-block; background-color: #3498db; color: white; padding: 12px 24px;
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                   text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 1.1em;
                   transition: background-color 0.2s;">
             🔗 Reconnect {{ provider_title }}
         </a>
     </div>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     <div style="text-align: center;">
         <p style="margin-bottom: 1rem; color: #666;">
             After reconnecting, you'll be able to post again.
@@ -43,4 +65,8 @@ a[href*="oauth2"]:hover {
     background-color: #2980b9 !important;
 }
 </style>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

@@ -113,10 +113,17 @@ logger = logging.getLogger(__name__)
 
 class TokenHealthFilter(admin.SimpleListFilter):
     """Filter tokens by health status."""
+<<<<<<< HEAD
     
     title = 'token health'
     parameter_name = 'health'
     
+=======
+
+    title = 'token health'
+    parameter_name = 'health'
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def lookups(self, request, model_admin):
         return (
             ('valid', 'Valid'),
@@ -124,11 +131,19 @@ class TokenHealthFilter(admin.SimpleListFilter):
             ('expiring_soon', 'Expiring Soon (7 days)'),
             ('no_expiry', 'No Expiry Set'),
         )
+<<<<<<< HEAD
     
     def queryset(self, request, queryset):
         now = timezone.now()
         week_from_now = now + timedelta(days=7)
         
+=======
+
+    def queryset(self, request, queryset):
+        now = timezone.now()
+        week_from_now = now + timedelta(days=7)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if self.value() == 'valid':
             return queryset.filter(
                 Q(expires_at__gt=now) | Q(expires_at__isnull=True)
@@ -142,20 +157,35 @@ class TokenHealthFilter(admin.SimpleListFilter):
             )
         elif self.value() == 'no_expiry':
             return queryset.filter(expires_at__isnull=True)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return queryset
 
 class ProviderFilter(admin.SimpleListFilter):
     """Filter tokens by OAuth provider."""
+<<<<<<< HEAD
     
     title = 'provider'
     parameter_name = 'provider'
     
+=======
+
+    title = 'provider'
+    parameter_name = 'provider'
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def lookups(self, request, model_admin):
         # Get unique providers from database
         providers = OAuthToken.objects.values_list('provider', flat=True).distinct()
         return [(provider, provider.title()) for provider in providers]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def queryset(self, request, queryset):
         if self.value():
             return queryset.filter(provider=self.value())
@@ -164,7 +194,11 @@ class ProviderFilter(admin.SimpleListFilter):
 @admin.register(OAuthToken)
 class OAuthTokenAdmin(admin.ModelAdmin):
     """Enhanced admin interface for OAuth tokens."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     list_display = [
         'provider_badge',
         'user_info',
@@ -174,14 +208,22 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         'expires_in_display',
         'actions_column'
     ]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     list_filter = [
         TokenHealthFilter,
         ProviderFilter,
         'created_at',
         'expires_at',
     ]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     search_fields = [
         'owner__username',
         'owner__email',
@@ -189,7 +231,11 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         'user_id',
         'name',
     ]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     readonly_fields = [
         'slug',
         'created_at',
@@ -198,7 +244,11 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         'masked_refresh_token',
         'token_info',
     ]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     fields = [
         'provider',
         'owner',
@@ -216,21 +266,35 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         'created_at',
         'token_info',
     ]
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     actions = [
         'delete_expired_tokens',
         'test_token_validity',
         'refresh_tokens',
     ]
+<<<<<<< HEAD
     
     list_per_page = 50
     
+=======
+
+    list_per_page = 50
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     class Media:
         css = {
             'all': ('oauth2_capture/admin/oauth2_admin.css',)
         }
         js = ('oauth2_capture/admin/oauth2_admin.js',)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_urls(self):
         """Add custom admin URLs."""
         urls = super().get_urls()
@@ -252,7 +316,11 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             ),
         ]
         return custom_urls + urls
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def provider_badge(self, obj):
         """Display provider with icon/badge."""
         provider_icons = {
@@ -264,9 +332,15 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             'reddit': '🤖',
             'pinterest': '📌',
         }
+<<<<<<< HEAD
         
         icon = provider_icons.get(obj.provider, '🔗')
         
+=======
+
+        icon = provider_icons.get(obj.provider, '🔗')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<span class="provider-badge provider-{}">{} {}</span>',
             obj.provider,
@@ -275,11 +349,19 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         )
     provider_badge.short_description = 'Provider'
     provider_badge.admin_order_field = 'provider'
+<<<<<<< HEAD
     
     def user_info(self, obj):
         """Display user information."""
         user_admin_url = reverse('admin:auth_user_change', args=[obj.owner.id])
         
+=======
+
+    def user_info(self, obj):
+        """Display user information."""
+        user_admin_url = reverse('admin:auth_user_change', args=[obj.owner.id])
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<a href="{}">{}</a><br><small>{}</small>',
             user_admin_url,
@@ -288,38 +370,62 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         )
     user_info.short_description = 'User'
     user_info.admin_order_field = 'owner__username'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def token_health(self, obj):
         """Display token health status."""
         if not obj.expires_at:
             return format_html(
                 '<span class="token-status no-expiry">No Expiry</span>'
             )
+<<<<<<< HEAD
         
         now = timezone.now()
         
+=======
+
+        now = timezone.now()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if obj.expires_at < now:
             time_ago = now - obj.expires_at
             return format_html(
                 '<span class="token-status expired">Expired<br><small>{} ago</small></span>',
                 self._humanize_timedelta(time_ago)
             )
+<<<<<<< HEAD
         
         time_until = obj.expires_at - now
         
+=======
+
+        time_until = obj.expires_at - now
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if time_until <= timedelta(days=7):
             return format_html(
                 '<span class="token-status expiring-soon">Expiring Soon<br><small>{} left</small></span>',
                 self._humanize_timedelta(time_until)
             )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<span class="token-status valid">Valid<br><small>{} left</small></span>',
             self._humanize_timedelta(time_until)
         )
     token_health.short_description = 'Health'
     token_health.admin_order_field = 'expires_at'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def oauth_username(self, obj):
         """Display OAuth provider username."""
         username = obj.username
@@ -327,17 +433,26 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             return format_html('<strong>{}</strong>', username)
         return format_html('<em>Unknown</em>')
     oauth_username.short_description = 'OAuth User'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def expires_in_display(self, obj):
         """Display expiration in human readable format."""
         return obj.expires_in_humanized
     expires_in_display.short_description = 'Expires'
     expires_in_display.admin_order_field = 'expires_at'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def actions_column(self, obj):
         """Display action buttons."""
         test_url = reverse('admin:oauth2_capture_oauthtoken_test', args=[obj.pk])
         refresh_url = reverse('admin:oauth2_capture_oauthtoken_refresh', args=[obj.pk])
+<<<<<<< HEAD
         
         actions = [
             f'<a href="{test_url}" class="button">Test</a>',
@@ -349,44 +464,85 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         return mark_safe(' '.join(actions))
     actions_column.short_description = 'Actions'
     
+=======
+
+        actions = [
+            f'<a href="{test_url}" class="button">Test</a>',
+        ]
+
+        if obj.refresh_token:
+            actions.append(f'<a href="{refresh_url}" class="button">Refresh</a>')
+
+        return mark_safe(' '.join(actions))
+    actions_column.short_description = 'Actions'
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def token_health_detail(self, obj):
         """Detailed token health information."""
         if not obj.expires_at:
             return "No expiration set - token does not expire"
+<<<<<<< HEAD
         
         now = timezone.now()
         
+=======
+
+        now = timezone.now()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if obj.expires_at < now:
             return format_html(
                 '<span style="color: red;">Token expired {} ago</span>',
                 self._humanize_timedelta(now - obj.expires_at)
             )
+<<<<<<< HEAD
         
         time_until = obj.expires_at - now
         
+=======
+
+        time_until = obj.expires_at - now
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if time_until <= timedelta(days=7):
             return format_html(
                 '<span style="color: orange;">Token expires in {}</span>',
                 self._humanize_timedelta(time_until)
             )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<span style="color: green;">Token valid for {}</span>',
             self._humanize_timedelta(time_until)
         )
     token_health_detail.short_description = 'Token Health'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def masked_access_token(self, obj):
         """Display masked access token."""
         if not obj.access_token:
             return "No access token"
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         token = obj.access_token
         if len(token) > 20:
             masked = token[:8] + '...' + token[-8:]
         else:
             masked = token[:4] + '...' + token[-4:]
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<code style="background: #f0f0f0; padding: 2px 4px; border-radius: 3px;">{}</code><br>'
             '<small>Length: {} characters</small>',
@@ -394,18 +550,30 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             len(token)
         )
     masked_access_token.short_description = 'Access Token (masked)'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def masked_refresh_token(self, obj):
         """Display masked refresh token."""
         if not obj.refresh_token:
             return "No refresh token"
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         token = obj.refresh_token
         if len(token) > 20:
             masked = token[:8] + '...' + token[-8:]
         else:
             masked = token[:4] + '...' + token[-4:]
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         return format_html(
             '<code style="background: #f0f0f0; padding: 2px 4px; border-radius: 3px;">{}</code><br>'
             '<small>Length: {} characters</small>',
@@ -413,6 +581,7 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             len(token)
         )
     masked_refresh_token.short_description = 'Refresh Token (masked)'
+<<<<<<< HEAD
     
     def token_info(self, obj):
         """Display additional token information."""
@@ -421,6 +590,16 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         if obj.token_type:
             info.append(f"Type: {obj.token_type}")
         
+=======
+
+    def token_info(self, obj):
+        """Display additional token information."""
+        info = []
+
+        if obj.token_type:
+            info.append(f"Type: {obj.token_type}")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if obj.scope:
             scopes = obj.scope.split()
             if len(scopes) > 5:
@@ -428,20 +607,35 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             else:
                 scope_display = ', '.join(scopes)
             info.append(f"Scopes: {scope_display}")
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if obj.profile_json:
             profile_keys = list(obj.profile_json.keys())
             if profile_keys:
                 info.append(f"Profile data: {', '.join(profile_keys[:10])}")
+<<<<<<< HEAD
         
         return format_html('<br>'.join(info)) if info else "No additional information"
     token_info.short_description = 'Token Information'
     
+=======
+
+        return format_html('<br>'.join(info)) if info else "No additional information"
+    token_info.short_description = 'Token Information'
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def delete_expired_tokens(self, request, queryset):
         """Delete expired tokens."""
         expired_tokens = queryset.filter(expires_at__lt=timezone.now())
         count = expired_tokens.count()
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if count > 0:
             expired_tokens.delete()
             self.message_user(
@@ -456,25 +650,45 @@ class OAuthTokenAdmin(admin.ModelAdmin):
                 messages.INFO
             )
     delete_expired_tokens.short_description = "Delete expired tokens"
+<<<<<<< HEAD
     
     def test_token_validity(self, request, queryset):
         """Test token validity for selected tokens."""
         results = {'valid': 0, 'invalid': 0, 'error': 0}
         
+=======
+
+    def test_token_validity(self, request, queryset):
+        """Test token validity for selected tokens."""
+        results = {'valid': 0, 'invalid': 0, 'error': 0}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         for token in queryset:
             try:
                 provider = OAuth2ProviderFactory.get_provider(token.provider)
                 access_token = provider.get_valid_token(token)
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 if access_token:
                     results['valid'] += 1
                 else:
                     results['invalid'] += 1
+<<<<<<< HEAD
                     
             except Exception as e:
                 results['error'] += 1
                 logger.exception(f"Error testing token {token.id}: {str(e)}")
         
+=======
+
+            except Exception as e:
+                results['error'] += 1
+                logger.exception(f"Error testing token {token.id}: {str(e)}")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.message_user(
             request,
             f"Token validation results: {results['valid']} valid, "
@@ -482,29 +696,53 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             messages.INFO
         )
     test_token_validity.short_description = "Test token validity"
+<<<<<<< HEAD
     
     def refresh_tokens(self, request, queryset):
         """Attempt to refresh selected tokens."""
         results = {'refreshed': 0, 'failed': 0, 'no_refresh_token': 0}
         
+=======
+
+    def refresh_tokens(self, request, queryset):
+        """Attempt to refresh selected tokens."""
+        results = {'refreshed': 0, 'failed': 0, 'no_refresh_token': 0}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         for token in queryset:
             if not token.refresh_token:
                 results['no_refresh_token'] += 1
                 continue
+<<<<<<< HEAD
             
             try:
                 provider = OAuth2ProviderFactory.get_provider(token.provider)
                 access_token = provider.get_valid_token(token)
                 
+=======
+
+            try:
+                provider = OAuth2ProviderFactory.get_provider(token.provider)
+                access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 if access_token:
                     results['refreshed'] += 1
                 else:
                     results['failed'] += 1
+<<<<<<< HEAD
                     
             except Exception as e:
                 results['failed'] += 1
                 logger.exception(f"Error refreshing token {token.id}: {str(e)}")
         
+=======
+
+            except Exception as e:
+                results['failed'] += 1
+                logger.exception(f"Error refreshing token {token.id}: {str(e)}")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.message_user(
             request,
             f"Refresh results: {results['refreshed']} refreshed, "
@@ -512,6 +750,7 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             messages.INFO
         )
     refresh_tokens.short_description = "Refresh tokens"
+<<<<<<< HEAD
     
     def test_token_view(self, request, object_id):
         """Test a single token's validity."""
@@ -527,6 +766,23 @@ class OAuthTokenAdmin(admin.ModelAdmin):
                 # Try to get user info to fully test token
                 user_info = provider.get_user_info(access_token)
                 
+=======
+
+    def test_token_view(self, request, object_id):
+        """Test a single token's validity."""
+        token = get_object_or_404(OAuthToken, pk=object_id)
+
+        try:
+            provider = OAuth2ProviderFactory.get_provider(token.provider)
+
+            # Test token validity
+            access_token = provider.get_valid_token(token)
+
+            if access_token:
+                # Try to get user info to fully test token
+                user_info = provider.get_user_info(access_token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 result = {
                     'valid': True,
                     'message': 'Token is valid and working',
@@ -542,12 +798,17 @@ class OAuthTokenAdmin(admin.ModelAdmin):
                     'valid': False,
                     'message': 'Token is invalid or expired'
                 }
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception as e:
             result = {
                 'valid': False,
                 'message': f'Error testing token: {str(e)}'
             }
+<<<<<<< HEAD
         
         return JsonResponse(result)
     
@@ -555,11 +816,21 @@ class OAuthTokenAdmin(admin.ModelAdmin):
         """Refresh a single token."""
         token = get_object_or_404(OAuthToken, pk=object_id)
         
+=======
+
+        return JsonResponse(result)
+
+    def refresh_token_view(self, request, object_id):
+        """Refresh a single token."""
+        token = get_object_or_404(OAuthToken, pk=object_id)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if not token.refresh_token:
             return JsonResponse({
                 'success': False,
                 'message': 'No refresh token available'
             })
+<<<<<<< HEAD
         
         try:
             provider = OAuth2ProviderFactory.get_provider(token.provider)
@@ -571,6 +842,19 @@ class OAuthTokenAdmin(admin.ModelAdmin):
             # Get valid token (will trigger refresh)
             access_token = provider.get_valid_token(token)
             
+=======
+
+        try:
+            provider = OAuth2ProviderFactory.get_provider(token.provider)
+
+            # Force refresh by temporarily setting token as expired
+            original_expires_at = token.expires_at
+            token.expires_at = timezone.now() - timedelta(hours=1)
+
+            # Get valid token (will trigger refresh)
+            access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if access_token:
                 result = {
                     'success': True,
@@ -581,25 +865,43 @@ class OAuthTokenAdmin(admin.ModelAdmin):
                 # Restore original expiration if refresh failed
                 token.expires_at = original_expires_at
                 token.save()
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 result = {
                     'success': False,
                     'message': 'Token refresh failed'
                 }
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception as e:
             result = {
                 'success': False,
                 'message': f'Error refreshing token: {str(e)}'
             }
+<<<<<<< HEAD
         
         return JsonResponse(result)
     
+=======
+
+        return JsonResponse(result)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def health_summary_view(self, request):
         """Display token health summary."""
         now = timezone.now()
         week_from_now = now + timedelta(days=7)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         summary = {
             'total_tokens': OAuthToken.objects.count(),
             'valid_tokens': OAuthToken.objects.filter(
@@ -615,15 +917,25 @@ class OAuthTokenAdmin(admin.ModelAdmin):
                 .order_by('-count')
             )
         }
+<<<<<<< HEAD
         
         return JsonResponse(summary)
     
+=======
+
+        return JsonResponse(summary)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _humanize_timedelta(self, td):
         """Convert timedelta to human readable string."""
         days = td.days
         hours, remainder = divmod(td.seconds, 3600)
         minutes, _ = divmod(remainder, 60)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if days > 0:
             return f"{days}d {hours}h"
         elif hours > 0:
@@ -770,7 +1082,11 @@ admin.site.index_title = "Welcome to OAuth2 Capture Administration"
 
 (function($) {
     'use strict';
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     // Test token functionality
     function testToken(url) {
         $.get(url)
@@ -785,13 +1101,21 @@ admin.site.index_title = "Welcome to OAuth2 Capture Administration"
                 alert('Error testing token. Please check the logs.');
             });
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     // Refresh token functionality
     function refreshToken(url) {
         if (!confirm('Are you sure you want to refresh this token?')) {
             return;
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         $.get(url)
             .done(function(data) {
                 if (data.success) {
@@ -805,7 +1129,11 @@ admin.site.index_title = "Welcome to OAuth2 Capture Administration"
                 alert('Error refreshing token. Please check the logs.');
             });
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     // Bind click events to action buttons
     $(document).ready(function() {
         // Test token buttons
@@ -813,18 +1141,30 @@ admin.site.index_title = "Welcome to OAuth2 Capture Administration"
             e.preventDefault();
             testToken($(this).attr('href'));
         });
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         // Refresh token buttons
         $('.refresh-token-btn').click(function(e) {
             e.preventDefault();
             refreshToken($(this).attr('href'));
         });
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         // Add CSS classes to action buttons
         $('a[href*="/test-token/"]').addClass('button test-token-btn');
         $('a[href*="/refresh-token/"]').addClass('button refresh-token-btn');
     });
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 })(django.jQuery);
 ```
 
@@ -890,10 +1230,17 @@ from oauth2_capture.admin import OAuthTokenAdmin
 from .fixtures import OAuthTestData
 
 class OAuthTokenAdminTests(TestCase):
+<<<<<<< HEAD
     
     def setUp(self):
         self.client = Client()
         
+=======
+
+    def setUp(self):
+        self.client = Client()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Create admin user
         self.admin_user = User.objects.create_user(
             username='admin',
@@ -902,6 +1249,7 @@ class OAuthTokenAdminTests(TestCase):
             is_staff=True,
             is_superuser=True
         )
+<<<<<<< HEAD
         
         # Create regular user for tokens
         self.user = OAuthTestData.create_test_user()
@@ -921,48 +1269,102 @@ class OAuthTokenAdminTests(TestCase):
         
         self.client.login(username='admin', password='adminpass')
     
+=======
+
+        # Create regular user for tokens
+        self.user = OAuthTestData.create_test_user()
+
+        # Create test tokens
+        self.valid_token = OAuthTestData.create_test_token(
+            self.user,
+            provider='twitter',
+            expired=False
+        )
+
+        self.expired_token = OAuthTestData.create_test_token(
+            self.user,
+            provider='github',
+            expired=True
+        )
+
+        self.client.login(username='admin', password='adminpass')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_admin_list_view(self):
         """Test admin list view displays tokens correctly."""
         url = reverse('admin:oauth2_capture_oauthtoken_changelist')
         response = self.client.get(url)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'twitter')
         self.assertContains(response, 'github')
         self.assertContains(response, self.user.username)
+<<<<<<< HEAD
     
     def test_admin_filters(self):
         """Test admin filters work correctly."""
         url = reverse('admin:oauth2_capture_oauthtoken_changelist')
         
+=======
+
+    def test_admin_filters(self):
+        """Test admin filters work correctly."""
+        url = reverse('admin:oauth2_capture_oauthtoken_changelist')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test provider filter
         response = self.client.get(url, {'provider': 'twitter'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'twitter')
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test health filter
         response = self.client.get(url, {'health': 'expired'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'github')  # Our expired token
+<<<<<<< HEAD
     
     def test_admin_search(self):
         """Test admin search functionality."""
         url = reverse('admin:oauth2_capture_oauthtoken_changelist')
         
+=======
+
+    def test_admin_search(self):
+        """Test admin search functionality."""
+        url = reverse('admin:oauth2_capture_oauthtoken_changelist')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Search by username
         response = self.client.get(url, {'q': self.user.username})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.user.username)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Search by provider
         response = self.client.get(url, {'q': 'twitter'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'twitter')
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_token_detail_view(self):
         """Test admin detail view shows masked tokens."""
         url = reverse('admin:oauth2_capture_oauthtoken_change', args=[self.valid_token.pk])
         response = self.client.get(url)
+<<<<<<< HEAD
         
         self.assertEqual(response.status_code, 200)
         
@@ -974,11 +1376,25 @@ class OAuthTokenAdminTests(TestCase):
         """Test bulk delete expired tokens action."""
         url = reverse('admin:oauth2_capture_oauthtoken_changelist')
         
+=======
+
+        self.assertEqual(response.status_code, 200)
+
+        # Should show masked token, not full token
+        self.assertNotContains(response, self.valid_token.access_token)
+        self.assertContains(response, '...')  # Masked indicator
+
+    def test_bulk_delete_expired_action(self):
+        """Test bulk delete expired tokens action."""
+        url = reverse('admin:oauth2_capture_oauthtoken_changelist')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Post action
         response = self.client.post(url, {
             'action': 'delete_expired_tokens',
             '_selected_action': [self.valid_token.pk, self.expired_token.pk]
         })
+<<<<<<< HEAD
         
         self.assertEqual(response.status_code, 302)  # Redirect after action
         
@@ -986,22 +1402,44 @@ class OAuthTokenAdminTests(TestCase):
         self.assertTrue(OAuthToken.objects.filter(pk=self.valid_token.pk).exists())
         self.assertFalse(OAuthToken.objects.filter(pk=self.expired_token.pk).exists())
     
+=======
+
+        self.assertEqual(response.status_code, 302)  # Redirect after action
+
+        # Check that expired token was deleted
+        self.assertTrue(OAuthToken.objects.filter(pk=self.valid_token.pk).exists())
+        self.assertFalse(OAuthToken.objects.filter(pk=self.expired_token.pk).exists())
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_health_summary_view(self):
         """Test health summary API endpoint."""
         url = reverse('admin:oauth2_capture_oauthtoken_health')
         response = self.client.get(url)
+<<<<<<< HEAD
         
         self.assertEqual(response.status_code, 200)
         
+=======
+
+        self.assertEqual(response.status_code, 200)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         data = response.json()
         self.assertIn('total_tokens', data)
         self.assertIn('valid_tokens', data)
         self.assertIn('expired_tokens', data)
         self.assertIn('by_provider', data)
+<<<<<<< HEAD
         
         self.assertEqual(data['total_tokens'], 2)
         self.assertEqual(data['expired_tokens'], 1)
     
+=======
+
+        self.assertEqual(data['total_tokens'], 2)
+        self.assertEqual(data['expired_tokens'], 1)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_admin_permissions(self):
         """Test admin permissions are enforced."""
         # Create non-staff user
@@ -1009,6 +1447,7 @@ class OAuthTokenAdminTests(TestCase):
             username='regular',
             password='regularpass'
         )
+<<<<<<< HEAD
         
         client = Client()
         client.login(username='regular', password='regularpass')
@@ -1023,15 +1462,36 @@ class OAuthTokenAdminTests(TestCase):
         """Test that tokens are properly masked in admin."""
         admin = OAuthTokenAdmin(OAuthToken, None)
         
+=======
+
+        client = Client()
+        client.login(username='regular', password='regularpass')
+
+        url = reverse('admin:oauth2_capture_oauthtoken_changelist')
+        response = client.get(url)
+
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+
+    def test_masked_token_display(self):
+        """Test that tokens are properly masked in admin."""
+        admin = OAuthTokenAdmin(OAuthToken, None)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test masked access token
         masked = admin.masked_access_token(self.valid_token)
         self.assertIn('...', masked)
         self.assertNotIn(self.valid_token.access_token, masked)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test masked refresh token
         masked = admin.masked_refresh_token(self.valid_token)
         self.assertIn('...', masked)
         self.assertNotIn(self.valid_token.refresh_token, masked)
+<<<<<<< HEAD
     
     def test_token_health_display(self):
         """Test token health display method."""
@@ -1045,6 +1505,21 @@ class OAuthTokenAdminTests(TestCase):
         health = admin.token_health(self.expired_token)
         self.assertIn('Expired', health)
         
+=======
+
+    def test_token_health_display(self):
+        """Test token health display method."""
+        admin = OAuthTokenAdmin(OAuthToken, None)
+
+        # Valid token
+        health = admin.token_health(self.valid_token)
+        self.assertIn('Valid', health)
+
+        # Expired token
+        health = admin.token_health(self.expired_token)
+        self.assertIn('Expired', health)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Token with no expiry
         no_expiry_token = OAuthToken.objects.create(
             provider='test',
@@ -1053,7 +1528,11 @@ class OAuthTokenAdminTests(TestCase):
             owner=self.user,
             expires_at=None
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         health = admin.token_health(no_expiry_token)
         self.assertIn('No Expiry', health)
 ```
@@ -1067,4 +1546,8 @@ class OAuthTokenAdminTests(TestCase):
 - [ ] Health summary dashboard for token overview
 - [ ] Custom styling for improved user experience
 - [ ] Full test coverage of admin functionality
+<<<<<<< HEAD
 - [ ] Proper permission handling and security measures
+=======
+- [ ] Proper permission handling and security measures
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

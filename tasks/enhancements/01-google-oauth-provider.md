@@ -88,22 +88,38 @@ Medium (1 day)
 
 class GoogleOAuth2Provider(OAuth2Provider):
     """Google OAuth2 provider with multi-service support."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @property
     def authorize_url(self) -> str:
         """The URL to authorize the user."""
         return "https://accounts.google.com/o/oauth2/v2/auth"
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @property
     def token_url(self) -> str:
         """The URL to exchange the code for a token."""
         return "https://oauth2.googleapis.com/token"
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @property
     def user_info_url(self) -> str:
         """The URL to get the user info."""
         return "https://www.googleapis.com/oauth2/v2/userinfo"
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_authorization_url(self, state: str, redirect_uri: str, request: HttpRequest) -> str:
         """Get the authorization URL with Google-specific parameters."""
         params = {
@@ -115,6 +131,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
             "access_type": "offline",  # Required for refresh tokens
             "prompt": "consent",  # Ensure refresh token is always returned
         }
+<<<<<<< HEAD
         
         # Add optional parameters
         if "include_granted_scopes" in self.config:
@@ -161,16 +178,69 @@ class GoogleOAuth2Provider(OAuth2Provider):
         scope_service_map = {
             "https://www.googleapis.com/auth/gmail": "gmail",
             "https://www.googleapis.com/auth/drive": "drive", 
+=======
+
+        # Add optional parameters
+        if "include_granted_scopes" in self.config:
+            params["include_granted_scopes"] = self.config["include_granted_scopes"]
+
+        return f"{self.authorize_url}?{urlencode(params)}"
+
+    def get_user_info(self, access_token: str) -> dict:
+        """Get the user info from Google."""
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        try:
+            response = requests.get(self.user_info_url, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            user_data = response.json()
+
+            # Enhance with additional Google-specific info
+            user_data = self._enhance_user_data(user_data, access_token)
+
+            return user_data
+
+        except requests.exceptions.RequestException as e:
+            logger.error("Google user info request failed: %s", str(e))
+            raise
+
+    def _enhance_user_data(self, user_data: dict, access_token: str) -> dict:
+        """Enhance user data with additional Google information."""
+
+        # Add accessible services based on scopes
+        user_data["accessible_services"] = self._detect_accessible_services(access_token)
+
+        # Add Google-specific fields mapping
+        user_data["username"] = user_data.get("email", "").split("@")[0]
+        user_data["avatar_url"] = user_data.get("picture")
+
+        return user_data
+
+    def _detect_accessible_services(self, access_token: str) -> list:
+        """Detect which Google services are accessible with current token."""
+        services = []
+
+        # Map scopes to services
+        scope_service_map = {
+            "https://www.googleapis.com/auth/gmail": "gmail",
+            "https://www.googleapis.com/auth/drive": "drive",
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             "https://www.googleapis.com/auth/calendar": "calendar",
             "https://www.googleapis.com/auth/youtube": "youtube",
             "https://www.googleapis.com/auth/analytics": "analytics",
             "https://www.googleapis.com/auth/contacts": "contacts",
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check token info to see granted scopes
         try:
             token_info = self._get_token_info(access_token)
             granted_scopes = token_info.get("scope", "").split()
+<<<<<<< HEAD
             
             for scope in granted_scopes:
                 if scope in scope_service_map:
@@ -181,16 +251,37 @@ class GoogleOAuth2Provider(OAuth2Provider):
         
         return services
     
+=======
+
+            for scope in granted_scopes:
+                if scope in scope_service_map:
+                    services.append(scope_service_map[scope])
+
+        except Exception as e:
+            logger.debug("Could not detect Google services: %s", str(e))
+
+        return services
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _get_token_info(self, access_token: str) -> dict:
         """Get token information from Google."""
         url = "https://www.googleapis.com/oauth2/v1/tokeninfo"
         params = {"access_token": access_token}
+<<<<<<< HEAD
         
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         
         return response.json()
     
+=======
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+
+        return response.json()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def exchange_code_for_token(self, code: str, redirect_uri: str, request: HttpRequest) -> dict:
         """Exchange the auth code for an access token."""
         data = {
@@ -200,6 +291,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
             "client_id": self.config["client_id"],
             "client_secret": self.config["client_secret"],
         }
+<<<<<<< HEAD
         
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         
@@ -217,6 +309,25 @@ class GoogleOAuth2Provider(OAuth2Provider):
         except requests.exceptions.RequestException as e:
             logger.error("Google token exchange failed: %s", str(e))
             
+=======
+
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        try:
+            response = requests.post(self.token_url, data=data, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            token_data = response.json()
+
+            # Log successful token exchange
+            logger.info("Google token exchange successful for redirect_uri: %s", redirect_uri)
+
+            return token_data
+
+        except requests.exceptions.RequestException as e:
+            logger.error("Google token exchange failed: %s", str(e))
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Return error information for better debugging
             if hasattr(e, 'response') and e.response is not None:
                 try:
@@ -224,9 +335,15 @@ class GoogleOAuth2Provider(OAuth2Provider):
                     return error_data
                 except ValueError:
                     return {"error": "token_exchange_failed", "error_description": str(e)}
+<<<<<<< HEAD
             
             return {"error": "network_error", "error_description": str(e)}
     
+=======
+
+            return {"error": "network_error", "error_description": str(e)}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def refresh_token(self, refresh_token: str) -> dict:
         """Refresh the Google access token."""
         data = {
@@ -235,6 +352,7 @@ class GoogleOAuth2Provider(OAuth2Provider):
             "client_id": self.config["client_id"],
             "client_secret": self.config["client_secret"],
         }
+<<<<<<< HEAD
         
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         
@@ -243,24 +361,46 @@ class GoogleOAuth2Provider(OAuth2Provider):
         
         response = retry_with_backoff(do_request)
         
+=======
+
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        def do_request() -> requests.Response:
+            return requests.post(self.token_url, data=data, headers=headers, timeout=10)
+
+        response = retry_with_backoff(do_request)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if response.status_code == 200:
             token_data = response.json()
             logger.info("Google token refresh successful")
             return token_data
         else:
             logger.error("Google token refresh failed: %s - %s", response.status_code, response.text)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             try:
                 error_data = response.json()
                 return error_data
             except ValueError:
                 return {"error": "refresh_failed", "error_description": response.text}
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def validate_token_detailed(self, access_token: str) -> 'TokenValidationResult':
         """Validate Google token with detailed information."""
         try:
             token_info = self._get_token_info(access_token)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Check if token is valid
             if "error" in token_info:
                 return TokenValidationResult(
@@ -268,7 +408,11 @@ class GoogleOAuth2Provider(OAuth2Provider):
                     message=f"Token validation failed: {token_info.get('error_description', 'Unknown error')}",
                     provider=self.provider_name
                 )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Check token expiration
             expires_in = token_info.get("expires_in")
             if expires_in and int(expires_in) <= 0:
@@ -277,7 +421,11 @@ class GoogleOAuth2Provider(OAuth2Provider):
                     message="Google token has expired",
                     provider=self.provider_name
                 )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             return TokenValidationResult(
                 status=TokenValidationStatus.VALID,
                 message="Google token is valid",
@@ -286,30 +434,49 @@ class GoogleOAuth2Provider(OAuth2Provider):
                 scopes=token_info.get("scope", "").split(),
                 expires_at=timezone.now() + timedelta(seconds=int(expires_in)) if expires_in else None
             )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except requests.exceptions.RequestException as e:
             return TokenValidationResult(
                 status=TokenValidationStatus.UNKNOWN,
                 message=f"Token validation network error: {str(e)}",
                 provider=self.provider_name
             )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_service_client(self, oauth_token: 'OAuthToken', service_name: str):
         """Get a configured Google API service client."""
         # This would return configured Google API client libraries
         # Implementation would depend on specific Google client library usage
         access_token = self.get_valid_token(oauth_token)
+<<<<<<< HEAD
         
         if not access_token:
             raise ValueError("No valid access token available")
         
+=======
+
+        if not access_token:
+            raise ValueError("No valid access token available")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Example structure - actual implementation would use Google client libraries
         return {
             'service': service_name,
             'access_token': access_token,
             'credentials': self._create_credentials(access_token)
         }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def _create_credentials(self, access_token: str):
         """Create Google API credentials object."""
         # This would create proper Google credentials object
@@ -345,7 +512,11 @@ class OAuth2ProviderFactory:
 
 class GoogleMockResponses:
     """Google API response mocks."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_EXCHANGE_SUCCESS = {
         "access_token": "ya29.a0AfH6SMBxxx...",
         "expires_in": 3599,
@@ -354,14 +525,22 @@ class GoogleMockResponses:
         "token_type": "Bearer",
         "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk1ZTAzZT..."
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_REFRESH_SUCCESS = {
         "access_token": "ya29.a0AfH6SMCxxx...",
         "expires_in": 3599,
         "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
         "token_type": "Bearer"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     USER_INFO_SUCCESS = {
         "id": "12345678901234567890",
         "email": "user@example.com",
@@ -372,7 +551,11 @@ class GoogleMockResponses:
         "picture": "https://lh3.googleusercontent.com/a-/AOh14GhRxxx",
         "locale": "en"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_INFO_SUCCESS = {
         "issued_to": "1234567890-xxx.apps.googleusercontent.com",
         "audience": "1234567890-xxx.apps.googleusercontent.com",
@@ -383,12 +566,20 @@ class GoogleMockResponses:
         "verified_email": "true",
         "access_type": "offline"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_EXCHANGE_ERROR = {
         "error": "invalid_grant",
         "error_description": "Bad Request"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TOKEN_INFO_INVALID = {
         "error": "invalid_token",
         "error_description": "Invalid Value"
@@ -408,36 +599,63 @@ from ..fixtures import OAuthTestData
 from .mock_responses import GoogleMockResponses
 
 class GoogleProviderTests(TestCase):
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def setUp(self):
         self.provider = GoogleOAuth2Provider('google')
         self.factory = RequestFactory()
         self.user = OAuthTestData.create_test_user()
+<<<<<<< HEAD
     
     def test_authorization_url_parameters(self):
         """Test Google authorization URL contains correct parameters."""
         request = self.factory.get('/')
         
+=======
+
+    def test_authorization_url_parameters(self):
+        """Test Google authorization URL contains correct parameters."""
+        request = self.factory.get('/')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         auth_url = self.provider.get_authorization_url(
             state='test_state',
             redirect_uri='http://example.com/callback',
             request=request
         )
+<<<<<<< HEAD
         
         # Check base URL
         self.assertIn('https://accounts.google.com/o/oauth2/v2/auth', auth_url)
         
+=======
+
+        # Check base URL
+        self.assertIn('https://accounts.google.com/o/oauth2/v2/auth', auth_url)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check required parameters
         self.assertIn('client_id=', auth_url)
         self.assertIn('redirect_uri=', auth_url)
         self.assertIn('response_type=code', auth_url)
         self.assertIn('state=test_state', auth_url)
         self.assertIn('scope=', auth_url)
+<<<<<<< HEAD
         
         # Check Google-specific parameters
         self.assertIn('access_type=offline', auth_url)
         self.assertIn('prompt=consent', auth_url)
     
+=======
+
+        # Check Google-specific parameters
+        self.assertIn('access_type=offline', auth_url)
+        self.assertIn('prompt=consent', auth_url)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.post')
     def test_token_exchange_success(self, mock_post):
         """Test successful Google token exchange."""
@@ -446,30 +664,52 @@ class GoogleProviderTests(TestCase):
             json=lambda: GoogleMockResponses.TOKEN_EXCHANGE_SUCCESS,
             raise_for_status=lambda: None
         )
+<<<<<<< HEAD
         
         request = self.factory.get('/')
         
+=======
+
+        request = self.factory.get('/')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         result = self.provider.exchange_code_for_token(
             code='test_code',
             redirect_uri='http://example.com/callback',
             request=request
         )
+<<<<<<< HEAD
         
         # Should call token endpoint
         mock_post.assert_called_once()
         call_args = mock_post.call_args
         
+=======
+
+        # Should call token endpoint
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check data includes required fields
         self.assertIn('grant_type', call_args[1]['data'])
         self.assertEqual(call_args[1]['data']['grant_type'], 'authorization_code')
         self.assertIn('code', call_args[1]['data'])
         self.assertIn('client_id', call_args[1]['data'])
         self.assertIn('client_secret', call_args[1]['data'])
+<<<<<<< HEAD
         
         # Check response parsing
         self.assertEqual(result['access_token'], GoogleMockResponses.TOKEN_EXCHANGE_SUCCESS['access_token'])
         self.assertIn('refresh_token', result)
     
+=======
+
+        # Check response parsing
+        self.assertEqual(result['access_token'], GoogleMockResponses.TOKEN_EXCHANGE_SUCCESS['access_token'])
+        self.assertIn('refresh_token', result)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.get')
     def test_user_info_retrieval(self, mock_get):
         """Test Google user info retrieval and enhancement."""
@@ -486,18 +726,31 @@ class GoogleProviderTests(TestCase):
                 raise_for_status=lambda: None
             )
         ]
+<<<<<<< HEAD
         
         result = self.provider.get_user_info('test_token')
         
         # Should make two calls: user info and token info
         self.assertEqual(mock_get.call_count, 2)
         
+=======
+
+        result = self.provider.get_user_info('test_token')
+
+        # Should make two calls: user info and token info
+        self.assertEqual(mock_get.call_count, 2)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check enhanced data
         self.assertEqual(result['email'], GoogleMockResponses.USER_INFO_SUCCESS['email'])
         self.assertIn('accessible_services', result)
         self.assertIn('username', result)
         self.assertIn('avatar_url', result)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.post')
     def test_token_refresh(self, mock_post):
         """Test Google token refresh."""
@@ -506,6 +759,7 @@ class GoogleProviderTests(TestCase):
             json=lambda: GoogleMockResponses.TOKEN_REFRESH_SUCCESS,
             raise_for_status=lambda: None
         )
+<<<<<<< HEAD
         
         result = self.provider.refresh_token('test_refresh_token')
         
@@ -520,6 +774,22 @@ class GoogleProviderTests(TestCase):
         # Check response
         self.assertEqual(result['access_token'], GoogleMockResponses.TOKEN_REFRESH_SUCCESS['access_token'])
     
+=======
+
+        result = self.provider.refresh_token('test_refresh_token')
+
+        # Should call token endpoint
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+
+        # Check refresh token data
+        self.assertEqual(call_args[1]['data']['grant_type'], 'refresh_token')
+        self.assertEqual(call_args[1]['data']['refresh_token'], 'test_refresh_token')
+
+        # Check response
+        self.assertEqual(result['access_token'], GoogleMockResponses.TOKEN_REFRESH_SUCCESS['access_token'])
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.get')
     def test_token_validation(self, mock_get):
         """Test Google token validation."""
@@ -528,18 +798,31 @@ class GoogleProviderTests(TestCase):
             json=lambda: GoogleMockResponses.TOKEN_INFO_SUCCESS,
             raise_for_status=lambda: None
         )
+<<<<<<< HEAD
         
         result = self.provider.validate_token_detailed('test_token')
         
         # Should call token info endpoint
         mock_get.assert_called_once()
         
+=======
+
+        result = self.provider.validate_token_detailed('test_token')
+
+        # Should call token info endpoint
+        mock_get.assert_called_once()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check validation result
         from oauth2_capture.services.oauth2 import TokenValidationStatus
         self.assertEqual(result.status, TokenValidationStatus.VALID)
         self.assertEqual(result.provider, 'google')
         self.assertIsNotNone(result.scopes)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.get')
     def test_accessible_services_detection(self, mock_get):
         """Test detection of accessible Google services."""
@@ -551,14 +834,24 @@ class GoogleProviderTests(TestCase):
             },
             raise_for_status=lambda: None
         )
+<<<<<<< HEAD
         
         services = self.provider._detect_accessible_services('test_token')
         
+=======
+
+        services = self.provider._detect_accessible_services('test_token')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Should detect Gmail and Drive services
         self.assertIn('gmail', services)
         self.assertIn('drive', services)
         self.assertNotIn('calendar', services)  # Not in scope
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @patch('requests.post')
     def test_error_handling(self, mock_post):
         """Test Google API error handling."""
@@ -567,12 +860,17 @@ class GoogleProviderTests(TestCase):
             json=lambda: GoogleMockResponses.TOKEN_EXCHANGE_ERROR,
             raise_for_status=lambda: requests.exceptions.HTTPError()
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         result = self.provider.exchange_code_for_token(
             code='invalid_code',
             redirect_uri='http://example.com/callback',
             request=self.factory.get('/')
         )
+<<<<<<< HEAD
         
         # Should return error information
         self.assertIn('error', result)
@@ -587,6 +885,22 @@ class GoogleProviderTests(TestCase):
             
             client_info = self.provider.get_service_client(token, 'gmail')
             
+=======
+
+        # Should return error information
+        self.assertIn('error', result)
+        self.assertEqual(result['error'], 'invalid_grant')
+
+    def test_service_client_creation(self):
+        """Test Google API service client creation."""
+        token = OAuthTestData.create_test_token(self.user, provider='google')
+
+        with patch.object(self.provider, 'get_valid_token') as mock_get_token:
+            mock_get_token.return_value = 'valid_access_token'
+
+            client_info = self.provider.get_service_client(token, 'gmail')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             self.assertEqual(client_info['service'], 'gmail')
             self.assertEqual(client_info['access_token'], 'valid_access_token')
             self.assertIn('credentials', client_info)
@@ -603,7 +917,11 @@ OAUTH2_CONFIG = {
         "client_secret": os.environ["GOOGLE_CLIENT_SECRET"],
         "scope": " ".join([
             "openid",
+<<<<<<< HEAD
             "https://www.googleapis.com/auth/userinfo.email", 
+=======
+            "https://www.googleapis.com/auth/userinfo.email",
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             "https://www.googleapis.com/auth/userinfo.profile",
             # Add additional scopes as needed:
             # "https://www.googleapis.com/auth/gmail.readonly",
@@ -631,4 +949,8 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 - [ ] Integration with Google API client libraries (foundation)
 - [ ] Complete test coverage including edge cases
 - [ ] Documentation for Google Developer Console setup
+<<<<<<< HEAD
 - [ ] Example usage patterns for different Google services
+=======
+- [ ] Example usage patterns for different Google services
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

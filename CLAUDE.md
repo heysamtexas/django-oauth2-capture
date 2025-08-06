@@ -25,10 +25,21 @@ This is `oauth2_capture`, a Django package for capturing and managing OAuth2 tok
 **Note**: uv run automatically uses the project's virtual environment
 
 - `ruff check .` - Run linting (configured in pyproject.toml)
+- `ruff check --fix .` - Auto-fix linting issues where possible
+- `ruff format .` - Format code according to project standards
 - `make prerelease` - Run pre-release checks including linting
 - Tests are located in `oauth2_capture/tests/` and individual app test files
 - **IMPORTANT**: Always use Django's test suite (`uv run python manage.py test`), NEVER use pytest
 
+#### Pre-commit Workflow
+**ALWAYS run these commands before every commit to ensure code quality:**
+
+1. `ruff check --fix .` - Auto-fix linting issues
+2. `ruff format .` - Format code consistently
+3. Run tests to ensure functionality is preserved
+4. Commit changes
+
+Note: Test files are excluded from linting rules via pyproject.toml configuration
 ### Code Coverage
 **Note**: Coverage commands must be run from project root directory where pyproject.toml is located
 

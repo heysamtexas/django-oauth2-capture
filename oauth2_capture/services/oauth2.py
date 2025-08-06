@@ -221,9 +221,8 @@ class OAuth2Provider(ABC):
                 error_msg = f"Failed to refresh token for {oauth_token.provider}:{oauth_token.name}"
                 logger.error("%s. Response: %s", error_msg, token_data)
                 raise TokenRefreshError(
-                    f"Token refresh failed for {oauth_token.provider}. "
-                    "Re-authorization may be required.",
-                    provider=oauth_token.provider
+                    f"Token refresh failed for {oauth_token.provider}. Re-authorization may be required.",
+                    provider=oauth_token.provider,
                 )
 
             try:
@@ -235,8 +234,8 @@ class OAuth2Provider(ABC):
             except Exception as e:
                 logger.exception("Error updating token for %s:%s.", oauth_token.provider, oauth_token.name)
                 raise TokenRefreshError(
-                    f"Error updating refreshed token for {oauth_token.provider}: {str(e)}",
-                    provider=oauth_token.provider
+                    f"Error updating refreshed token for {oauth_token.provider}: {e!s}",
+                    provider=oauth_token.provider,
                 ) from e
 
         logger.debug("Token for %s:%s is valid", oauth_token.provider, oauth_token.name)

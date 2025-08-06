@@ -16,6 +16,10 @@ repos:
     # Run the linter.
     - id: ruff
       exclude: ruff.xml
+      # Use project configuration from pyproject.toml
+      args: [--config=pyproject.toml]
     # Run the formatter.
     - id: ruff-format
       exclude: ruff.xml
+      # Use project configuration from pyproject.toml
+      args: [--config=pyproject.toml]

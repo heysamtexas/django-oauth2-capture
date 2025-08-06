@@ -94,21 +94,33 @@ logger = logging.getLogger(__name__)
 
 class TokenEncryption:
     """Token encryption and decryption utilities."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def __init__(self, key: Optional[bytes] = None):
         """Initialize with encryption key."""
         self.key = key or self._derive_key()
         self.fernet = Fernet(self.key)
+<<<<<<< HEAD
     
     def _derive_key(self) -> bytes:
         """Derive encryption key from Django SECRET_KEY or dedicated key."""
         
+=======
+
+    def _derive_key(self) -> bytes:
+        """Derive encryption key from Django SECRET_KEY or dedicated key."""
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check for dedicated encryption key first
         encryption_key = getattr(settings, 'OAUTH2_ENCRYPTION_KEY', None)
         if encryption_key:
             if isinstance(encryption_key, str):
                 return base64.urlsafe_b64encode(encryption_key.encode()[:32].ljust(32, b'\0'))
             return encryption_key
+<<<<<<< HEAD
         
         # Fall back to deriving from SECRET_KEY
         secret_key = settings.SECRET_KEY.encode()
@@ -116,33 +128,61 @@ class TokenEncryption:
         # Use a fixed salt for consistency (in production, consider configurable salt)
         salt = b'oauth2_token_salt_v1'  
         
+=======
+
+        # Fall back to deriving from SECRET_KEY
+        secret_key = settings.SECRET_KEY.encode()
+
+        # Use a fixed salt for consistency (in production, consider configurable salt)
+        salt = b'oauth2_token_salt_v1'
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
             salt=salt,
             iterations=100000,
         )
+<<<<<<< HEAD
         
         key = base64.urlsafe_b64encode(kdf.derive(secret_key))
         return key
     
+=======
+
+        key = base64.urlsafe_b64encode(kdf.derive(secret_key))
+        return key
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def encrypt(self, plaintext: str) -> str:
         """Encrypt a plaintext string."""
         if not plaintext:
             return plaintext
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             encrypted_bytes = self.fernet.encrypt(plaintext.encode('utf-8'))
             return base64.urlsafe_b64encode(encrypted_bytes).decode('ascii')
         except Exception as e:
             logger.error("Token encryption failed: %s", str(e))
             raise
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def decrypt(self, ciphertext: str) -> str:
         """Decrypt a ciphertext string."""
         if not ciphertext:
             return ciphertext
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             encrypted_bytes = base64.urlsafe_b64decode(ciphertext.encode('ascii'))
             decrypted_bytes = self.fernet.decrypt(encrypted_bytes)
@@ -151,11 +191,16 @@ class TokenEncryption:
             logger.error("Token decryption failed: %s", str(e))
             # In production, consider whether to raise or return empty string
             raise
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def is_encrypted(self, value: str) -> bool:
         """Check if a value appears to be encrypted."""
         if not value:
             return False
+<<<<<<< HEAD
         
         try:
             # Try to decode as base64 - encrypted values should be base64 encoded
@@ -165,6 +210,17 @@ class TokenEncryption:
             # Fernet tokens are always 145+ characters when base64 encoded
             return len(value) >= 100  # Conservative estimate
             
+=======
+
+        try:
+            # Try to decode as base64 - encrypted values should be base64 encoded
+            base64.urlsafe_b64decode(value.encode('ascii'))
+
+            # Additional heuristic: encrypted values have specific length patterns
+            # Fernet tokens are always 145+ characters when base64 encoded
+            return len(value) >= 100  # Conservative estimate
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception:
             return False
 
@@ -203,14 +259,21 @@ logger = logging.getLogger(__name__)
 
 class EncryptedTextField(models.TextField):
     """TextField that automatically encrypts/decrypts values."""
+<<<<<<< HEAD
     
     description = "Encrypted text field"
     
+=======
+
+    description = "Encrypted text field"
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def __init__(self, *args, **kwargs):
         # Remove encryption-specific kwargs
         self.encrypt_enabled = kwargs.pop('encrypt_enabled', True)
         self.migration_mode = kwargs.pop('migration_mode', False)
         super().__init__(*args, **kwargs)
+<<<<<<< HEAD
     
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
@@ -218,15 +281,32 @@ class EncryptedTextField(models.TextField):
         # Set up descriptor for transparent encryption/decryption
         setattr(cls, self.name, EncryptedFieldDescriptor(self))
     
+=======
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+
+        # Set up descriptor for transparent encryption/decryption
+        setattr(cls, self.name, EncryptedFieldDescriptor(self))
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def from_db_value(self, value, expression, connection):
         """Convert database value to Python value."""
         if value is None:
             return value
+<<<<<<< HEAD
         
         # During migration, some values might not be encrypted yet
         if self.migration_mode or not self.encrypt_enabled:
             return value
         
+=======
+
+        # During migration, some values might not be encrypted yet
+        if self.migration_mode or not self.encrypt_enabled:
+            return value
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             # Only decrypt if the value appears to be encrypted
             if is_token_encrypted(value):
@@ -239,12 +319,17 @@ class EncryptedTextField(models.TextField):
             logger.error("Failed to decrypt token: %s", str(e))
             # Return empty string rather than failing completely
             return ""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def to_python(self, value):
         """Convert any value to Python representation."""
         if value is None:
             return value
         return str(value)
+<<<<<<< HEAD
     
     def get_prep_value(self, value):
         """Convert Python value for database storage.""" 
@@ -254,6 +339,17 @@ class EncryptedTextField(models.TextField):
         if not self.encrypt_enabled:
             return value
         
+=======
+
+    def get_prep_value(self, value):
+        """Convert Python value for database storage."""
+        if value is None or value == "":
+            return value
+
+        if not self.encrypt_enabled:
+            return value
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             # Only encrypt if not already encrypted
             if not is_token_encrypted(value):
@@ -265,6 +361,7 @@ class EncryptedTextField(models.TextField):
 
 class EncryptedCharField(models.CharField):
     """CharField that automatically encrypts/decrypts values."""
+<<<<<<< HEAD
     
     description = "Encrypted char field"
     
@@ -272,10 +369,20 @@ class EncryptedCharField(models.CharField):
         self.encrypt_enabled = kwargs.pop('encrypt_enabled', True)
         self.migration_mode = kwargs.pop('migration_mode', False)
         
+=======
+
+    description = "Encrypted char field"
+
+    def __init__(self, *args, **kwargs):
+        self.encrypt_enabled = kwargs.pop('encrypt_enabled', True)
+        self.migration_mode = kwargs.pop('migration_mode', False)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Encrypted values are longer - adjust max_length if needed
         original_max_length = kwargs.get('max_length', 500)
         if self.encrypt_enabled and original_max_length < 200:
             kwargs['max_length'] = max(original_max_length * 3, 500)
+<<<<<<< HEAD
         
         super().__init__(*args, **kwargs)
     
@@ -283,14 +390,30 @@ class EncryptedCharField(models.CharField):
         super().contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, EncryptedFieldDescriptor(self))
     
+=======
+
+        super().__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        super().contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.name, EncryptedFieldDescriptor(self))
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def from_db_value(self, value, expression, connection):
         """Convert database value to Python value."""
         if value is None:
             return value
+<<<<<<< HEAD
         
         if self.migration_mode or not self.encrypt_enabled:
             return value
         
+=======
+
+        if self.migration_mode or not self.encrypt_enabled:
+            return value
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             if is_token_encrypted(value):
                 return decrypt_token(value)
@@ -300,11 +423,16 @@ class EncryptedCharField(models.CharField):
         except Exception as e:
             logger.error("Failed to decrypt CharField token: %s", str(e))
             return ""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_prep_value(self, value):
         """Convert Python value for database storage."""
         if value is None or value == "":
             return value
+<<<<<<< HEAD
         
         if not self.encrypt_enabled:
             return value
@@ -320,6 +448,23 @@ class EncryptedCharField(models.CharField):
                         len(encrypted), self.max_length
                     )
                 
+=======
+
+        if not self.encrypt_enabled:
+            return value
+
+        try:
+            if not is_token_encrypted(value):
+                encrypted = encrypt_token(str(value))
+
+                # Check if encrypted value fits in field length
+                if len(encrypted) > self.max_length:
+                    logger.warning(
+                        "Encrypted token length (%d) exceeds field max_length (%d)",
+                        len(encrypted), self.max_length
+                    )
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 return encrypted
             return value
         except Exception as e:
@@ -328,6 +473,7 @@ class EncryptedCharField(models.CharField):
 
 class EncryptedFieldDescriptor:
     """Descriptor for encrypted fields to handle transparent encryption/decryption."""
+<<<<<<< HEAD
     
     def __init__(self, field):
         self.field = field
@@ -342,6 +488,22 @@ class EncryptedFieldDescriptor:
         if value is None:
             return None
         
+=======
+
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        # Get the raw value from the instance
+        value = instance.__dict__.get(self.field.attname)
+
+        if value is None:
+            return None
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Return decrypted value if encryption is enabled
         if self.field.encrypt_enabled and not self.field.migration_mode:
             try:
@@ -349,9 +511,15 @@ class EncryptedFieldDescriptor:
                     return decrypt_token(value)
             except Exception as e:
                 logger.error("Field descriptor decryption failed: %s", str(e))
+<<<<<<< HEAD
         
         return value
     
+=======
+
+        return value
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def __set__(self, instance, value):
         # Store the value as-is in the instance
         # Encryption happens in get_prep_value when saving to database
@@ -376,19 +544,31 @@ class OAuthToken(models.Model):
         help_text="The name of the OAuth provider (e.g., 'google', 'github', 'facebook').",
     )
     slug = ShortUUIDField()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Use encrypted fields for sensitive data
     access_token = EncryptedTextField(
         help_text="The OAuth access token for API access (encrypted at rest).",
         encrypt_enabled=getattr(settings, 'OAUTH2_ENCRYPT_TOKENS', True)
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     expires_at = models.DateTimeField(
         null=True,
         blank=True,
         help_text="The exact expiration time of the access token.",
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     refresh_token = EncryptedCharField(
         max_length=1500,  # Increased to handle encrypted values
         blank=True,
@@ -396,7 +576,11 @@ class OAuthToken(models.Model):
         help_text="The refresh token, if provided by the OAuth provider (encrypted at rest).",
         encrypt_enabled=getattr(settings, 'OAUTH2_ENCRYPT_TOKENS', True)
     )
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     refresh_token_expires_at = models.DateTimeField(
         null=True, blank=True, help_text="The expiration time of the refresh token."
     )
@@ -456,13 +640,21 @@ class OAuthToken(models.Model):
     def username(self) -> str:
         """Return the username associated with the OAuth token."""
         return self.profile_json.get("username", "") or self.profile_json.get("login", "") or self.name
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_decrypted_access_token(self) -> str:
         """Explicitly get decrypted access token (for debugging/admin)."""
         # This method provides explicit access to decrypted tokens
         # Useful for admin interfaces or debugging
         return self.access_token
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def get_decrypted_refresh_token(self) -> str:
         """Explicitly get decrypted refresh token (for debugging/admin)."""
         return self.refresh_token
@@ -477,6 +669,7 @@ from django.conf import settings
 def encrypt_existing_tokens(apps, schema_editor):
     """Encrypt existing plain text tokens."""
     OAuthToken = apps.get_model('oauth2_capture', 'OAuthToken')
+<<<<<<< HEAD
     
     # Only run if encryption is enabled
     if not getattr(settings, 'OAUTH2_ENCRYPT_TOKENS', True):
@@ -488,11 +681,25 @@ def encrypt_existing_tokens(apps, schema_editor):
     tokens_updated = 0
     tokens_failed = 0
     
+=======
+
+    # Only run if encryption is enabled
+    if not getattr(settings, 'OAUTH2_ENCRYPT_TOKENS', True):
+        return
+
+    # Import encryption functions
+    from oauth2_capture.encryption import encrypt_token, is_token_encrypted
+
+    tokens_updated = 0
+    tokens_failed = 0
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     for token in OAuthToken.objects.all():
         try:
             # Encrypt access token if not already encrypted
             if token.access_token and not is_token_encrypted(token.access_token):
                 token.access_token = encrypt_token(token.access_token)
+<<<<<<< HEAD
             
             # Encrypt refresh token if not already encrypted
             if token.refresh_token and not is_token_encrypted(token.refresh_token):
@@ -505,22 +712,46 @@ def encrypt_existing_tokens(apps, schema_editor):
             print(f"Failed to encrypt token {token.id}: {str(e)}")
             tokens_failed += 1
     
+=======
+
+            # Encrypt refresh token if not already encrypted
+            if token.refresh_token and not is_token_encrypted(token.refresh_token):
+                token.refresh_token = encrypt_token(token.refresh_token)
+
+            token.save()
+            tokens_updated += 1
+
+        except Exception as e:
+            print(f"Failed to encrypt token {token.id}: {str(e)}")
+            tokens_failed += 1
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     print(f"Token encryption complete: {tokens_updated} updated, {tokens_failed} failed")
 
 def decrypt_existing_tokens(apps, schema_editor):
     """Decrypt tokens back to plain text (reverse migration)."""
     OAuthToken = apps.get_model('oauth2_capture', 'OAuthToken')
+<<<<<<< HEAD
     
     from oauth2_capture.encryption import decrypt_token, is_token_encrypted
     
     tokens_updated = 0
     tokens_failed = 0
     
+=======
+
+    from oauth2_capture.encryption import decrypt_token, is_token_encrypted
+
+    tokens_updated = 0
+    tokens_failed = 0
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     for token in OAuthToken.objects.all():
         try:
             # Decrypt access token if encrypted
             if token.access_token and is_token_encrypted(token.access_token):
                 token.access_token = decrypt_token(token.access_token)
+<<<<<<< HEAD
             
             # Decrypt refresh token if encrypted
             if token.refresh_token and is_token_encrypted(token.refresh_token):
@@ -541,6 +772,28 @@ class Migration(migrations.Migration):
         ('oauth2_capture', '0002_alter_oauthtoken_access_token'),
     ]
     
+=======
+
+            # Decrypt refresh token if encrypted
+            if token.refresh_token and is_token_encrypted(token.refresh_token):
+                token.refresh_token = decrypt_token(token.refresh_token)
+
+            token.save()
+            tokens_updated += 1
+
+        except Exception as e:
+            print(f"Failed to decrypt token {token.id}: {str(e)}")
+            tokens_failed += 1
+
+    print(f"Token decryption complete: {tokens_updated} updated, {tokens_failed} failed")
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('oauth2_capture', '0002_alter_oauthtoken_access_token'),
+    ]
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     operations = [
         migrations.RunPython(
             encrypt_existing_tokens,
@@ -561,7 +814,11 @@ import os
 
 class Command(BaseCommand):
     help = 'Rotate encryption keys for OAuth tokens'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def add_arguments(self, parser):
         parser.add_argument(
             '--new-key',
@@ -574,16 +831,25 @@ class Command(BaseCommand):
             action='store_true',
             help='Show what would be done without making changes'
         )
+<<<<<<< HEAD
     
     def handle(self, *args, **options):
         new_key_b64 = options['new_key']
         dry_run = options['dry_run']
         
+=======
+
+    def handle(self, *args, **options):
+        new_key_b64 = options['new_key']
+        dry_run = options['dry_run']
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             # Validate new key
             import base64
             new_key = base64.urlsafe_b64decode(new_key_b64.encode())
             new_encryption = TokenEncryption(new_key)
+<<<<<<< HEAD
             
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Invalid new key: {str(e)}"))
@@ -605,6 +871,29 @@ class Command(BaseCommand):
         updated_count = 0
         failed_count = 0
         
+=======
+
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Invalid new key: {str(e)}"))
+            return
+
+        # Get current encryption instance
+        from oauth2_capture.encryption import get_encryption
+        current_encryption = get_encryption()
+
+        tokens_to_update = OAuthToken.objects.all()
+        total_tokens = tokens_to_update.count()
+
+        self.stdout.write(f"Found {total_tokens} tokens to re-encrypt")
+
+        if dry_run:
+            self.stdout.write(self.style.WARNING("DRY RUN - No changes will be made"))
+            return
+
+        updated_count = 0
+        failed_count = 0
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         with transaction.atomic():
             for token in tokens_to_update:
                 try:
@@ -613,11 +902,16 @@ class Command(BaseCommand):
                         decrypted_access = current_encryption.decrypt(token.access_token)
                         # Re-encrypt with new key
                         token.access_token = new_encryption.encrypt(decrypted_access)
+<<<<<<< HEAD
                     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                     if token.refresh_token:
                         decrypted_refresh = current_encryption.decrypt(token.refresh_token)
                         # Re-encrypt with new key
                         token.refresh_token = new_encryption.encrypt(decrypted_refresh)
+<<<<<<< HEAD
                     
                     token.save()
                     updated_count += 1
@@ -625,18 +919,35 @@ class Command(BaseCommand):
                     if updated_count % 100 == 0:
                         self.stdout.write(f"Updated {updated_count}/{total_tokens} tokens...")
                         
+=======
+
+                    token.save()
+                    updated_count += 1
+
+                    if updated_count % 100 == 0:
+                        self.stdout.write(f"Updated {updated_count}/{total_tokens} tokens...")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 except Exception as e:
                     self.stdout.write(
                         self.style.ERROR(f"Failed to update token {token.id}: {str(e)}")
                     )
                     failed_count += 1
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Key rotation complete: {updated_count} updated, {failed_count} failed"
             )
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if failed_count == 0:
             self.stdout.write(
                 self.style.SUCCESS(
@@ -674,42 +985,75 @@ from oauth2_capture.fields import EncryptedTextField, EncryptedCharField
 from .fixtures import OAuthTestData
 
 class TokenEncryptionTests(TestCase):
+<<<<<<< HEAD
     
     def setUp(self):
         self.encryption = TokenEncryption()
         self.test_token = "test_access_token_12345"
         
+=======
+
+    def setUp(self):
+        self.encryption = TokenEncryption()
+        self.test_token = "test_access_token_12345"
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_encrypt_decrypt_roundtrip(self):
         """Test that encryption and decryption work correctly."""
         encrypted = self.encryption.encrypt(self.test_token)
         decrypted = self.encryption.decrypt(encrypted)
+<<<<<<< HEAD
         
         self.assertNotEqual(encrypted, self.test_token)
         self.assertEqual(decrypted, self.test_token)
     
+=======
+
+        self.assertNotEqual(encrypted, self.test_token)
+        self.assertEqual(decrypted, self.test_token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_encrypted_token_detection(self):
         """Test detection of encrypted vs plain text tokens."""
         plain_token = "plain_text_token"
         encrypted_token = self.encryption.encrypt(plain_token)
+<<<<<<< HEAD
         
         self.assertFalse(is_token_encrypted(plain_token))
         self.assertTrue(is_token_encrypted(encrypted_token))
     
+=======
+
+        self.assertFalse(is_token_encrypted(plain_token))
+        self.assertTrue(is_token_encrypted(encrypted_token))
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_empty_token_handling(self):
         """Test handling of empty/None tokens."""
         self.assertEqual(encrypt_token(""), "")
         self.assertEqual(encrypt_token(None), None)
         self.assertEqual(decrypt_token(""), "")
         self.assertEqual(decrypt_token(None), None)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_encryption_consistency(self):
         """Test that encryption is consistent but unique."""
         token1 = self.encryption.encrypt(self.test_token)
         token2 = self.encryption.encrypt(self.test_token)
+<<<<<<< HEAD
         
         # Different ciphertext (due to random IV)
         self.assertNotEqual(token1, token2)
         
+=======
+
+        # Different ciphertext (due to random IV)
+        self.assertNotEqual(token1, token2)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # But same plaintext
         self.assertEqual(
             self.encryption.decrypt(token1),
@@ -717,10 +1061,17 @@ class TokenEncryptionTests(TestCase):
         )
 
 class EncryptedFieldTests(TestCase):
+<<<<<<< HEAD
     
     def setUp(self):
         self.user = OAuthTestData.create_test_user()
     
+=======
+
+    def setUp(self):
+        self.user = OAuthTestData.create_test_user()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @override_settings(OAUTH2_ENCRYPT_TOKENS=True)
     def test_encrypted_token_storage(self):
         """Test that tokens are encrypted when stored."""
@@ -731,6 +1082,7 @@ class EncryptedFieldTests(TestCase):
             refresh_token='plain_refresh_token',
             owner=self.user
         )
+<<<<<<< HEAD
         
         # Refresh from database to get stored values
         token.refresh_from_db()
@@ -739,6 +1091,16 @@ class EncryptedFieldTests(TestCase):
         self.assertEqual(token.access_token, 'plain_access_token')
         self.assertEqual(token.refresh_token, 'plain_refresh_token')
         
+=======
+
+        # Refresh from database to get stored values
+        token.refresh_from_db()
+
+        # Values should be transparently decrypted
+        self.assertEqual(token.access_token, 'plain_access_token')
+        self.assertEqual(token.refresh_token, 'plain_refresh_token')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # But stored values in database should be encrypted
         from django.db import connection
         with connection.cursor() as cursor:
@@ -748,6 +1110,7 @@ class EncryptedFieldTests(TestCase):
             )
             row = cursor.fetchone()
             stored_access, stored_refresh = row
+<<<<<<< HEAD
             
             # Stored values should be different from plain text
             self.assertNotEqual(stored_access, 'plain_access_token')
@@ -757,6 +1120,17 @@ class EncryptedFieldTests(TestCase):
             self.assertTrue(is_token_encrypted(stored_access))
             self.assertTrue(is_token_encrypted(stored_refresh))
     
+=======
+
+            # Stored values should be different from plain text
+            self.assertNotEqual(stored_access, 'plain_access_token')
+            self.assertNotEqual(stored_refresh, 'plain_refresh_token')
+
+            # And should be detectable as encrypted
+            self.assertTrue(is_token_encrypted(stored_access))
+            self.assertTrue(is_token_encrypted(stored_refresh))
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     @override_settings(OAUTH2_ENCRYPT_TOKENS=False)
     def test_disabled_encryption(self):
         """Test that encryption can be disabled."""
@@ -766,7 +1140,11 @@ class EncryptedFieldTests(TestCase):
             access_token='plain_access_token',
             owner=self.user
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Check database storage directly
         from django.db import connection
         with connection.cursor() as cursor:
@@ -775,14 +1153,22 @@ class EncryptedFieldTests(TestCase):
                 [token.id]
             )
             stored_access = cursor.fetchone()[0]
+<<<<<<< HEAD
             
             # Should be stored as plain text
             self.assertEqual(stored_access, 'plain_access_token')
     
+=======
+
+            # Should be stored as plain text
+            self.assertEqual(stored_access, 'plain_access_token')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_migration_mode_handling(self):
         """Test handling of mixed encrypted/unencrypted tokens during migration."""
         # Create token with migration mode (bypasses encryption)
         from oauth2_capture.fields import EncryptedTextField
+<<<<<<< HEAD
         
         field = EncryptedTextField(migration_mode=True)
         
@@ -794,11 +1180,28 @@ class EncryptedFieldTests(TestCase):
         self.assertEqual(field.from_db_value(encrypted_value, None, None), encrypted_value)
         self.assertEqual(field.from_db_value(plain_value, None, None), plain_value)
     
+=======
+
+        field = EncryptedTextField(migration_mode=True)
+
+        # Should handle both encrypted and unencrypted values
+        encrypted_value = encrypt_token('test_token')
+        plain_value = 'plain_token'
+
+        # Both should pass through unchanged in migration mode
+        self.assertEqual(field.from_db_value(encrypted_value, None, None), encrypted_value)
+        self.assertEqual(field.from_db_value(plain_value, None, None), plain_value)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_field_length_validation(self):
         """Test that encrypted values fit in field lengths."""
         # Long token that might exceed field length when encrypted
         long_token = 'x' * 400
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             token = OAuthToken.objects.create(
                 provider='test',
@@ -807,18 +1210,27 @@ class EncryptedFieldTests(TestCase):
                 refresh_token=long_token,
                 owner=self.user
             )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Should be able to read back correctly
             token.refresh_from_db()
             self.assertEqual(token.access_token, long_token)
             self.assertEqual(token.refresh_token, long_token)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except ValidationError as e:
             # This might fail if encrypted token exceeds field length
             self.assertIn('encryption', str(e).lower())
 
 class EncryptionPerformanceTests(TestCase):
     """Test performance impact of encryption."""
+<<<<<<< HEAD
     
     def test_encryption_performance(self):
         """Test that encryption doesn't significantly impact performance."""
@@ -827,6 +1239,16 @@ class EncryptionPerformanceTests(TestCase):
         user = OAuthTestData.create_test_user()
         test_token = 'performance_test_token_' * 10  # ~250 chars
         
+=======
+
+    def test_encryption_performance(self):
+        """Test that encryption doesn't significantly impact performance."""
+        import time
+
+        user = OAuthTestData.create_test_user()
+        test_token = 'performance_test_token_' * 10  # ~250 chars
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test encrypted token creation
         start_time = time.time()
         for i in range(100):
@@ -838,12 +1260,21 @@ class EncryptionPerformanceTests(TestCase):
                 owner=user
             )
             token.save()
+<<<<<<< HEAD
         
         encrypted_time = time.time() - start_time
         
         # Cleanup
         OAuthToken.objects.filter(provider__startswith='test').delete()
         
+=======
+
+        encrypted_time = time.time() - start_time
+
+        # Cleanup
+        OAuthToken.objects.filter(provider__startswith='test').delete()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test with encryption disabled
         with override_settings(OAUTH2_ENCRYPT_TOKENS=False):
             start_time = time.time()
@@ -856,12 +1287,21 @@ class EncryptionPerformanceTests(TestCase):
                     owner=user
                 )
                 token.save()
+<<<<<<< HEAD
             
             plain_time = time.time() - start_time
         
         # Encryption should not be more than 3x slower
         performance_ratio = encrypted_time / plain_time
         self.assertLess(performance_ratio, 3.0, 
+=======
+
+            plain_time = time.time() - start_time
+
+        # Encryption should not be more than 3x slower
+        performance_ratio = encrypted_time / plain_time
+        self.assertLess(performance_ratio, 3.0,
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                        f"Encryption too slow: {performance_ratio:.2f}x slower than plain text")
 ```
 
@@ -874,4 +1314,8 @@ class EncryptionPerformanceTests(TestCase):
 - [ ] Backward compatibility with existing code
 - [ ] Key rotation functionality for security maintenance
 - [ ] Comprehensive test coverage including edge cases
+<<<<<<< HEAD
 - [ ] Documentation for configuration and deployment
+=======
+- [ ] Documentation for configuration and deployment
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

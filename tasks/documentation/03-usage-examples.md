@@ -237,11 +237,19 @@ from .models import Post, PostResult
 @login_required
 def dashboard(request):
     """Main dashboard showing user's posts and connected accounts."""
+<<<<<<< HEAD
     
     # Get user's connected accounts
     connected_accounts = {}
     tokens = OAuthToken.objects.filter(owner=request.user)
     
+=======
+
+    # Get user's connected accounts
+    connected_accounts = {}
+    tokens = OAuthToken.objects.filter(owner=request.user)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     for token in tokens:
         try:
             provider = OAuth2ProviderFactory.get_provider(token.provider)
@@ -257,16 +265,27 @@ def dashboard(request):
                 'error': str(e),
                 'reauth_url': f'/oauth2/{token.provider}/authorize/'
             }
+<<<<<<< HEAD
     
     # Get user's recent posts
     posts = Post.objects.filter(user=request.user)[:10]
     
+=======
+
+    # Get user's recent posts
+    posts = Post.objects.filter(user=request.user)[:10]
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     context = {
         'connected_accounts': connected_accounts,
         'posts': posts,
         'available_providers': ['twitter', 'linkedin', 'github']
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'myapp/dashboard.html', context)
 
 @login_required
@@ -275,6 +294,7 @@ def create_post(request):
     if request.method == 'POST':
         content = request.POST.get('content', '').strip()
         selected_providers = request.POST.getlist('providers')
+<<<<<<< HEAD
         
         if not content:
             messages.error(request, 'Post content cannot be empty')
@@ -284,6 +304,17 @@ def create_post(request):
             messages.error(request, 'Please select at least one provider')
             return redirect('dashboard')
         
+=======
+
+        if not content:
+            messages.error(request, 'Post content cannot be empty')
+            return redirect('dashboard')
+
+        if not selected_providers:
+            messages.error(request, 'Please select at least one provider')
+            return redirect('dashboard')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Create the post
         post = Post.objects.create(
             user=request.user,
@@ -291,23 +322,37 @@ def create_post(request):
             providers=selected_providers,
             status='draft'
         )
+<<<<<<< HEAD
         
         # Attempt to post immediately
         success = post_to_providers(post)
         
+=======
+
+        # Attempt to post immediately
+        success = post_to_providers(post)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if success:
             messages.success(request, 'Post created successfully!')
         else:
             messages.warning(request, 'Post created but some providers failed. Check post details.')
+<<<<<<< HEAD
         
         return redirect('post_detail', post_id=post.id)
     
+=======
+
+        return redirect('post_detail', post_id=post.id)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return redirect('dashboard')
 
 def post_to_providers(post):
     """Post content to all selected providers."""
     post.status = 'posting'
     post.save()
+<<<<<<< HEAD
     
     all_success = True
     
@@ -315,6 +360,15 @@ def post_to_providers(post):
         try:
             result = post_to_single_provider(post, provider_name)
             
+=======
+
+    all_success = True
+
+    for provider_name in post.providers:
+        try:
+            result = post_to_single_provider(post, provider_name)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             PostResult.objects.create(
                 post=post,
                 provider=provider_name,
@@ -323,10 +377,17 @@ def post_to_providers(post):
                 external_url=result.get('external_url', ''),
                 error_message=result.get('error_message', '')
             )
+<<<<<<< HEAD
             
             if not result['success']:
                 all_success = False
                 
+=======
+
+            if not result['success']:
+                all_success = False
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         except Exception as e:
             PostResult.objects.create(
                 post=post,
@@ -335,37 +396,61 @@ def post_to_providers(post):
                 error_message=str(e)
             )
             all_success = False
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Update post status
     if all_success:
         post.status = 'posted'
         post.posted_at = timezone.now()
     else:
         post.status = 'failed'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     post.save()
     return all_success
 
 def post_to_single_provider(post, provider_name):
     """Post to a single provider."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Get user's token for this provider
     token = OAuthToken.objects.filter(
         provider=provider_name,
         owner=post.user
     ).first()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if not token:
         return {
             'success': False,
             'error_message': f'No {provider_name} account connected'
         }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Get valid access token
     try:
         provider = OAuth2ProviderFactory.get_provider(provider_name)
         access_token = provider.get_valid_token(token)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if not access_token:
             return {
                 'success': False,
@@ -376,7 +461,11 @@ def post_to_single_provider(post, provider_name):
             'success': False,
             'error_message': f'Token validation failed: {str(e)}'
         }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Post to provider (implement based on provider)
     try:
         if provider_name == 'twitter':
@@ -399,7 +488,11 @@ def post_to_single_provider(post, provider_name):
 def post_to_twitter(access_token, content):
     """Post to Twitter using API v2."""
     import requests
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     url = "https://api.twitter.com/2/tweets"
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -408,9 +501,15 @@ def post_to_twitter(access_token, content):
     data = {
         "text": content
     }
+<<<<<<< HEAD
     
     response = requests.post(url, headers=headers, json=data, timeout=10)
     
+=======
+
+    response = requests.post(url, headers=headers, json=data, timeout=10)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if response.status_code == 201:
         tweet_data = response.json()
         return {
@@ -429,23 +528,36 @@ def post_detail(request, post_id):
     """View post details and results."""
     post = get_object_or_404(Post, id=post_id, user=request.user)
     results = post.results.all().order_by('provider')
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     context = {
         'post': post,
         'results': results
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return render(request, 'myapp/post_detail.html', context)
 
 @login_required
 def retry_failed_providers(request, post_id):
     """Retry posting to failed providers."""
     post = get_object_or_404(Post, id=post_id, user=request.user)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if request.method == 'POST':
         # Get failed providers
         failed_results = post.results.filter(success=False)
         failed_providers = [result.provider for result in failed_results]
+<<<<<<< HEAD
         
         if not failed_providers:
             messages.info(request, 'No failed providers to retry')
@@ -454,12 +566,26 @@ def retry_failed_providers(request, post_id):
         # Delete old failed results
         failed_results.delete()
         
+=======
+
+        if not failed_providers:
+            messages.info(request, 'No failed providers to retry')
+            return redirect('post_detail', post_id=post.id)
+
+        # Delete old failed results
+        failed_results.delete()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Retry posting
         success_count = 0
         for provider_name in failed_providers:
             try:
                 result = post_to_single_provider(post, provider_name)
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 PostResult.objects.create(
                     post=post,
                     provider=provider_name,
@@ -468,10 +594,17 @@ def retry_failed_providers(request, post_id):
                     external_url=result.get('external_url', ''),
                     error_message=result.get('error_message', '')
                 )
+<<<<<<< HEAD
                 
                 if result['success']:
                     success_count += 1
                     
+=======
+
+                if result['success']:
+                    success_count += 1
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             except Exception as e:
                 PostResult.objects.create(
                     post=post,
@@ -479,10 +612,17 @@ def retry_failed_providers(request, post_id):
                     success=False,
                     error_message=str(e)
                 )
+<<<<<<< HEAD
         
         if success_count > 0:
             messages.success(request, f'Successfully posted to {success_count} provider(s)')
             
+=======
+
+        if success_count > 0:
+            messages.success(request, f'Successfully posted to {success_count} provider(s)')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Update post status if all are now successful
             if not post.results.filter(success=False).exists():
                 post.status = 'posted'
@@ -490,7 +630,11 @@ def retry_failed_providers(request, post_id):
                 post.save()
         else:
             messages.error(request, 'All retry attempts failed')
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return redirect('post_detail', post_id=post.id)
 ```
 
@@ -505,7 +649,11 @@ def retry_failed_providers(request, post_id):
 {% block content %}
 <div class="container">
     <h1>Social Media Dashboard</h1>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     <!-- Connected Accounts Status -->
     <div class="row mb-4">
         <div class="col-12">
@@ -553,7 +701,11 @@ def retry_failed_providers(request, post_id):
             </div>
         </div>
     </div>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     <!-- Create New Post -->
     <div class="row mb-4">
         <div class="col-12">
@@ -562,17 +714,29 @@ def retry_failed_providers(request, post_id):
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="content" class="form-label">Post Content</label>
+<<<<<<< HEAD
                     <textarea class="form-control" id="content" name="content" rows="4" 
                               maxlength="280" placeholder="What's on your mind?"></textarea>
                     <div class="form-text">280 characters maximum</div>
                 </div>
                 
+=======
+                    <textarea class="form-control" id="content" name="content" rows="4"
+                              maxlength="280" placeholder="What's on your mind?"></textarea>
+                    <div class="form-text">280 characters maximum</div>
+                </div>
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 <div class="mb-3">
                     <label class="form-label">Post to:</label>
                     {% for provider, info in connected_accounts.items %}
                         {% if info.connected %}
                         <div class="form-check">
+<<<<<<< HEAD
                             <input class="form-check-input" type="checkbox" name="providers" 
+=======
+                            <input class="form-check-input" type="checkbox" name="providers"
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                                    value="{{ provider }}" id="provider_{{ provider }}">
                             <label class="form-check-label" for="provider_{{ provider }}">
                                 {{ provider|title }} (@{{ info.username }})
@@ -581,12 +745,20 @@ def retry_failed_providers(request, post_id):
                         {% endif %}
                     {% endfor %}
                 </div>
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 <button type="submit" class="btn btn-primary">Post Now</button>
             </form>
         </div>
     </div>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     <!-- Recent Posts -->
     <div class="row">
         <div class="col-12">
@@ -635,14 +807,24 @@ def retry_failed_providers(request, post_id):
                     <li class="breadcrumb-item active">Post Details</li>
                 </ol>
             </nav>
+<<<<<<< HEAD
             
             <h2>Post Details</h2>
             
+=======
+
+            <h2>Post Details</h2>
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             <!-- Post Content -->
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">
+<<<<<<< HEAD
                         Status: 
+=======
+                        Status:
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                         <span class="badge bg-{{ post.status|yesno:'success,danger,warning' }}">
                             {{ post.get_status_display }}
                         </span>
@@ -658,7 +840,11 @@ def retry_failed_providers(request, post_id):
                     </p>
                 </div>
             </div>
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             <!-- Provider Results -->
             <h4>Provider Results</h4>
             {% if results %}
@@ -675,7 +861,11 @@ def retry_failed_providers(request, post_id):
                                     <span class="badge bg-danger">Failed</span>
                                 {% endif %}
                             </h6>
+<<<<<<< HEAD
                             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                             {% if result.success %}
                                 {% if result.external_url %}
                                     <p><a href="{{ result.external_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -690,7 +880,11 @@ def retry_failed_providers(request, post_id):
                                     {{ result.error_message }}
                                 </div>
                             {% endif %}
+<<<<<<< HEAD
                             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                             <p class="card-text">
                                 <small class="text-muted">{{ result.created_at }}</small>
                             </p>
@@ -699,7 +893,11 @@ def retry_failed_providers(request, post_id):
                 </div>
                 {% endfor %}
             </div>
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             <!-- Retry Failed Providers -->
             {% if post.results.filter_success_False %}
             <div class="mt-3">
@@ -711,7 +909,11 @@ def retry_failed_providers(request, post_id):
                 </form>
             </div>
             {% endif %}
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             {% else %}
             <p>No results available.</p>
             {% endif %}
@@ -757,23 +959,40 @@ logger = logging.getLogger(__name__)
 @shared_task(bind=True, max_retries=3)
 def post_to_providers_async(self, post_id):
     """Asynchronously post to all providers for a given post."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     try:
         post = Post.objects.get(id=post_id)
     except Post.DoesNotExist:
         logger.error(f"Post {post_id} not found")
         return {'error': 'Post not found'}
+<<<<<<< HEAD
     
     post.status = 'posting'
     post.save()
     
     results = {}
     
+=======
+
+    post.status = 'posting'
+    post.save()
+
+    results = {}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     for provider_name in post.providers:
         try:
             result = post_to_provider_sync(post, provider_name)
             results[provider_name] = result
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             # Save result to database
             PostResult.objects.create(
                 post=post,
@@ -783,22 +1002,38 @@ def post_to_providers_async(self, post_id):
                 external_url=result.get('external_url', ''),
                 error_message=result.get('error_message', '')
             )
+<<<<<<< HEAD
             
         except Exception as e:
             logger.exception(f"Error posting to {provider_name} for post {post_id}")
             results[provider_name] = {'success': False, 'error': str(e)}
             
+=======
+
+        except Exception as e:
+            logger.exception(f"Error posting to {provider_name} for post {post_id}")
+            results[provider_name] = {'success': False, 'error': str(e)}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             PostResult.objects.create(
                 post=post,
                 provider=provider_name,
                 success=False,
                 error_message=str(e)
             )
+<<<<<<< HEAD
     
     # Update post status
     successful_posts = sum(1 for result in results.values() if result['success'])
     total_providers = len(post.providers)
     
+=======
+
+    # Update post status
+    successful_posts = sum(1 for result in results.values() if result['success'])
+    total_providers = len(post.providers)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if successful_posts == total_providers:
         post.status = 'posted'
         post.posted_at = timezone.now()
@@ -806,9 +1041,15 @@ def post_to_providers_async(self, post_id):
         post.status = 'partial'
     else:
         post.status = 'failed'
+<<<<<<< HEAD
     
     post.save()
     
+=======
+
+    post.save()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return {
         'post_id': post_id,
         'successful_posts': successful_posts,
@@ -819,34 +1060,59 @@ def post_to_providers_async(self, post_id):
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def refresh_expired_tokens(self):
     """Background task to refresh expired tokens."""
+<<<<<<< HEAD
     
     from datetime import timedelta
     
+=======
+
+    from datetime import timedelta
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Find tokens that will expire in the next hour
     soon_expiring = OAuthToken.objects.filter(
         expires_at__lte=timezone.now() + timedelta(hours=1),
         expires_at__gt=timezone.now()
     )
+<<<<<<< HEAD
     
     refreshed_count = 0
     failed_count = 0
     
+=======
+
+    refreshed_count = 0
+    failed_count = 0
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     for token in soon_expiring:
         try:
             provider = OAuth2ProviderFactory.get_provider(token.provider)
             access_token = provider.get_valid_token(token)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             if access_token:
                 refreshed_count += 1
                 logger.info(f"Refreshed token for {token.provider}:{token.user_id}")
             else:
                 failed_count += 1
                 logger.warning(f"Failed to refresh token for {token.provider}:{token.user_id}")
+<<<<<<< HEAD
                 
         except Exception as e:
             failed_count += 1
             logger.exception(f"Error refreshing token for {token.provider}:{token.user_id}")
     
+=======
+
+        except Exception as e:
+            failed_count += 1
+            logger.exception(f"Error refreshing token for {token.provider}:{token.user_id}")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return {
         'refreshed_count': refreshed_count,
         'failed_count': failed_count,
@@ -864,11 +1130,19 @@ def create_post(request):
     if request.method == 'POST':
         content = request.POST.get('content', '').strip()
         selected_providers = request.POST.getlist('providers')
+<<<<<<< HEAD
         
         if not content or not selected_providers:
             messages.error(request, 'Content and providers are required')
             return redirect('dashboard')
         
+=======
+
+        if not content or not selected_providers:
+            messages.error(request, 'Content and providers are required')
+            return redirect('dashboard')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Create the post
         post = Post.objects.create(
             user=request.user,
@@ -876,6 +1150,7 @@ def create_post(request):
             providers=selected_providers,
             status='queued'
         )
+<<<<<<< HEAD
         
         # Queue for async processing
         from .tasks import post_to_providers_async
@@ -884,6 +1159,16 @@ def create_post(request):
         messages.success(request, 'Post queued for publishing!')
         return redirect('post_detail', post_id=post.id)
     
+=======
+
+        # Queue for async processing
+        from .tasks import post_to_providers_async
+        post_to_providers_async.delay(post.id)
+
+        messages.success(request, 'Post queued for publishing!')
+        return redirect('post_detail', post_id=post.id)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return redirect('dashboard')
 ```
 
@@ -912,4 +1197,8 @@ The example can be extended with additional features like:
 - [ ] Performance optimization techniques shown
 - [ ] Testing examples and patterns included
 - [ ] Integration examples with popular Django packages
+<<<<<<< HEAD
 - [ ] Troubleshooting and debugging guidance
+=======
+- [ ] Troubleshooting and debugging guidance
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

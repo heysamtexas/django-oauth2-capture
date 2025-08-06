@@ -33,7 +33,11 @@ class TokenError(Exception):
     """Base exception for token-related errors"""
     pass
 
+<<<<<<< HEAD
 class TokenRefreshError(TokenError): 
+=======
+class TokenRefreshError(TokenError):
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     """Token refresh failed - may be retryable"""
     pass
 
@@ -49,7 +53,11 @@ class TokenRevokedError(TokenError):
 ## Testing Requirements
 1. **Successful Refresh Test**: Verify normal token refresh continues to work
 2. **Network Error Test**: Mock network failure during refresh
+<<<<<<< HEAD
 3. **Expired Refresh Token Test**: Simulate expired refresh token scenario  
+=======
+3. **Expired Refresh Token Test**: Simulate expired refresh token scenario
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 4. **Revoked Token Test**: Mock provider response for revoked token
 5. **Exception Propagation Test**: Verify exceptions bubble up correctly
 6. **Backward Compatibility Test**: Ensure existing usage patterns still work
@@ -86,7 +94,11 @@ class TokenRefreshError(TokenError):
         super().__init__(message, provider, recoverable=True)
         self.response_code = response_code
 
+<<<<<<< HEAD
 class TokenExpiredError(TokenError): 
+=======
+class TokenExpiredError(TokenError):
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     """Token expired and refresh failed - re-auth required."""
     def __init__(self, message: str, provider: str = None):
         super().__init__(message, provider, recoverable=False)
@@ -96,7 +108,11 @@ class TokenExpiredError(TokenError):
 ```python
 def get_valid_token(self, oauth_token: OAuthToken) -> str:
     """Get a valid access token, refreshing if necessary.
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     Raises:
         TokenExpiredError: When token is expired and refresh fails
         TokenRefreshError: When refresh fails due to network/API issues
@@ -104,15 +120,26 @@ def get_valid_token(self, oauth_token: OAuthToken) -> str:
     """
     if oauth_token.expires_at and oauth_token.expires_at <= timezone.now():
         logger.debug(f"Token for {oauth_token.provider}:{oauth_token.name} has expired. Refreshing...")
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         try:
             token_data = self.refresh_token(oauth_token.refresh_token)
         except requests.RequestException as e:
             raise TokenRefreshError(
+<<<<<<< HEAD
                 f"Network error during token refresh: {str(e)}", 
                 provider=self.provider_name
             )
         
+=======
+                f"Network error during token refresh: {str(e)}",
+                provider=self.provider_name
+            )
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         if not token_data or "access_token" not in token_data:
             # Analyze the error response to determine appropriate exception
             if "error" in token_data:
@@ -122,14 +149,24 @@ def get_valid_token(self, oauth_token: OAuthToken) -> str:
                         f"Refresh token expired for {oauth_token.provider}:{oauth_token.name}",
                         provider=self.provider_name
                     )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             raise TokenRefreshError(
                 f"Token refresh failed: {token_data}",
                 provider=self.provider_name
             )
+<<<<<<< HEAD
         
         # Update token logic remains the same...
     
+=======
+
+        # Update token logic remains the same...
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     return oauth_token.access_token
 ```
 
@@ -157,4 +194,8 @@ except TokenRefreshError as e:
 - [ ] Backward compatibility maintained (with deprecation path)
 - [ ] Comprehensive logging of error scenarios
 - [ ] Demo application updated to show proper error handling
+<<<<<<< HEAD
 - [ ] Full test coverage of all error scenarios
+=======
+- [ ] Full test coverage of all error scenarios
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

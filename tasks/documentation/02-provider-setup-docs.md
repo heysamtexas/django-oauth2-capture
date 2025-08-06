@@ -81,7 +81,11 @@ Medium (1 day total, can be done incrementally per provider)
 
 ## Files to Create
 - `docs/twitter-setup.md`: Twitter/X OAuth 2.0 app setup (Tier 1)
+<<<<<<< HEAD
 - `docs/google-setup.md`: Google OAuth 2.0 setup (Tier 1) 
+=======
+- `docs/google-setup.md`: Google OAuth 2.0 setup (Tier 1)
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 - `docs/github-setup.md`: GitHub OAuth app setup (Tier 2)
 - `docs/reddit-setup.md`: Reddit application setup (Tier 2)
 - `docs/pinterest-setup.md`: Pinterest developer setup (Tier 3)
@@ -190,7 +194,11 @@ Select the permissions your app needs:
   ```
   https://yourdomain.com/oauth2/twitter/callback/
   ```
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
   For local development:
   ```
   http://localhost:8000/oauth2/twitter/callback/
@@ -288,6 +296,7 @@ def test_twitter_oauth(request):
 def test_twitter_api(request):
     # Test API call with user's token
     token = OAuthToken.objects.filter(
+<<<<<<< HEAD
         provider='twitter', 
         owner=request.user
     ).first()
@@ -298,6 +307,18 @@ def test_twitter_api(request):
     provider = OAuth2ProviderFactory.get_provider('twitter')
     access_token = provider.get_valid_token(token)
     
+=======
+        provider='twitter',
+        owner=request.user
+    ).first()
+
+    if not token:
+        return HttpResponse("No Twitter token found. Please authorize first.")
+
+    provider = OAuth2ProviderFactory.get_provider('twitter')
+    access_token = provider.get_valid_token(token)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     if access_token:
         user_info = provider.get_user_info(access_token)
         return HttpResponse(f"Connected as: {user_info.get('name')}")
@@ -442,7 +463,11 @@ This guide compares the OAuth providers supported by oauth2_capture to help you 
 
 ## Detailed Provider Analysis
 
+<<<<<<< HEAD
 ### Twitter (X) 
+=======
+### Twitter (X)
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
 **Complexity: ⭐⭐⭐⭐⭐**
 
 **Strengths:**
@@ -648,4 +673,8 @@ Start with 1-2 core providers, test thoroughly, and expand based on user feedbac
 - [ ] Production deployment considerations
 - [ ] Provider comparison and selection guidance
 - [ ] Code examples that work with current provider APIs
+<<<<<<< HEAD
 - [ ] Regular update process for maintaining accuracy
+=======
+- [ ] Regular update process for maintaining accuracy
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)

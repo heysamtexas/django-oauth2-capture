@@ -74,7 +74,11 @@ Simple (half day)
 
 class ProfileDataFixtures:
     """Profile data fixtures for different providers."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     TWITTER_PROFILE = {
         "id": "123456789",
         "name": "Test User",
@@ -85,11 +89,19 @@ class ProfileDataFixtures:
         "followers_count": 100,
         "following_count": 50
     }
+<<<<<<< HEAD
     
     GITHUB_PROFILE = {
         "login": "testuser",
         "id": 123456,
         "node_id": "MDQ6VXNlcjEyMzQ1Ng==", 
+=======
+
+    GITHUB_PROFILE = {
+        "login": "testuser",
+        "id": 123456,
+        "node_id": "MDQ6VXNlcjEyMzQ1Ng==",
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         "avatar_url": "https://github.com/images/error/octocat_happy.gif",
         "name": "Test User",
         "company": "Test Company",
@@ -101,31 +113,53 @@ class ProfileDataFixtures:
         "followers": 10,
         "following": 15
     }
+<<<<<<< HEAD
     
     LINKEDIN_PROFILE = {
         "sub": "xyz123abc",
         "name": "Test User",
         "given_name": "Test", 
+=======
+
+    LINKEDIN_PROFILE = {
+        "sub": "xyz123abc",
+        "name": "Test User",
+        "given_name": "Test",
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         "family_name": "User",
         "picture": "https://media.licdn.com/media/profile.jpg",
         "email": "test@example.com",
         "email_verified": True,
         "locale": "en-US"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     # Edge case profiles for testing
     MINIMAL_PROFILE = {
         "id": "minimal_id"
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     NULL_NAME_PROFILE = {
         "id": "null_name_id",
         "login": "nullnameuser",
         "name": None
     }
+<<<<<<< HEAD
     
     EMPTY_PROFILE = {}
     
+=======
+
+    EMPTY_PROFILE = {}
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     COMPLEX_NESTED_PROFILE = {
         "id": "complex_id",
         "name": "Complex User",
@@ -157,7 +191,11 @@ from .fixtures.profile_data import ProfileDataFixtures
 
 class OAuthTokenModelTests(TestCase):
     """Test cases for OAuthToken model."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def setUp(self):
         self.user = User.objects.create_user(
             username='testuser',
@@ -166,10 +204,17 @@ class OAuthTokenModelTests(TestCase):
         )
         self.user2 = User.objects.create_user(
             username='testuser2',
+<<<<<<< HEAD
             email='test2@example.com', 
             password='testpass123'
         )
     
+=======
+            email='test2@example.com',
+            password='testpass123'
+        )
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def create_token(self, **kwargs):
         """Helper to create test tokens with defaults."""
         defaults = {
@@ -185,7 +230,11 @@ class OAuthTokenModelTests(TestCase):
         }
         defaults.update(kwargs)
         return OAuthToken.objects.create(**defaults)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_token_creation_with_required_fields(self):
         """Test creating token with minimum required fields."""
         token = OAuthToken.objects.create(
@@ -194,17 +243,26 @@ class OAuthTokenModelTests(TestCase):
             access_token='github_access_token',
             owner=self.user
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.assertEqual(token.provider, 'github')
         self.assertEqual(token.user_id, '987654')
         self.assertEqual(token.access_token, 'github_access_token')
         self.assertEqual(token.owner, self.user)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Optional fields should have defaults
         self.assertEqual(token.refresh_token, '')
         self.assertEqual(token.token_type, '')
         self.assertEqual(token.scope, '')
         self.assertEqual(token.name, '')
+<<<<<<< HEAD
         
     def test_token_string_representation(self):
         """Test the __str__ method of OAuthToken."""
@@ -220,37 +278,79 @@ class OAuthTokenModelTests(TestCase):
         expected = f"twitter () @ {self.user}"
         self.assertEqual(str(token), expected)
     
+=======
+
+    def test_token_string_representation(self):
+        """Test the __str__ method of OAuthToken."""
+        token = self.create_token()
+
+        expected = f"twitter (Test User) @ {self.user}"
+        self.assertEqual(str(token), expected)
+
+    def test_token_string_representation_no_name(self):
+        """Test __str__ method when name is empty."""
+        token = self.create_token(name='')
+
+        expected = f"twitter () @ {self.user}"
+        self.assertEqual(str(token), expected)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_unique_constraint_provider_user_id(self):
         """Test unique constraint on provider + user_id combination."""
         # Create first token
         self.create_token()
+<<<<<<< HEAD
         
         # Attempting to create second token with same provider + user_id should fail
         with self.assertRaises(IntegrityError):
             self.create_token()
     
+=======
+
+        # Attempting to create second token with same provider + user_id should fail
+        with self.assertRaises(IntegrityError):
+            self.create_token()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_unique_constraint_allows_different_providers(self):
         """Test that same user_id is allowed for different providers."""
         token1 = self.create_token(provider='twitter')
         token2 = self.create_token(provider='github', user_id='123456')  # Same user_id, different provider
+<<<<<<< HEAD
         
         self.assertNotEqual(token1.id, token2.id)
         self.assertEqual(token1.user_id, token2.user_id)
         self.assertNotEqual(token1.provider, token2.provider)
     
+=======
+
+        self.assertNotEqual(token1.id, token2.id)
+        self.assertEqual(token1.user_id, token2.user_id)
+        self.assertNotEqual(token1.provider, token2.provider)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_unique_constraint_allows_different_user_ids(self):
         """Test that different user_ids are allowed for same provider."""
         token1 = self.create_token(user_id='123456')
         token2 = self.create_token(user_id='654321')  # Different user_id, same provider
+<<<<<<< HEAD
         
         self.assertNotEqual(token1.id, token2.id)
         self.assertNotEqual(token1.user_id, token2.user_id)
         self.assertEqual(token1.provider, token2.provider)
     
+=======
+
+        self.assertNotEqual(token1.id, token2.id)
+        self.assertNotEqual(token1.user_id, token2.user_id)
+        self.assertEqual(token1.provider, token2.provider)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_foreign_key_cascade_delete(self):
         """Test that tokens are deleted when user is deleted."""
         token = self.create_token()
         token_id = token.id
+<<<<<<< HEAD
         
         # Verify token exists
         self.assertTrue(OAuthToken.objects.filter(id=token_id).exists())
@@ -261,10 +361,23 @@ class OAuthTokenModelTests(TestCase):
         # Token should be deleted due to CASCADE
         self.assertFalse(OAuthToken.objects.filter(id=token_id).exists())
     
+=======
+
+        # Verify token exists
+        self.assertTrue(OAuthToken.objects.filter(id=token_id).exists())
+
+        # Delete the user
+        self.user.delete()
+
+        # Token should be deleted due to CASCADE
+        self.assertFalse(OAuthToken.objects.filter(id=token_id).exists())
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_related_name_oauth_tokens(self):
         """Test the related_name for accessing tokens from user."""
         token1 = self.create_token(provider='twitter')
         token2 = self.create_token(provider='github', user_id='different_id')
+<<<<<<< HEAD
         
         # Should be able to access tokens via related name
         user_tokens = self.user.oauth_tokens.all()
@@ -273,17 +386,34 @@ class OAuthTokenModelTests(TestCase):
         self.assertIn(token1, user_tokens)
         self.assertIn(token2, user_tokens)
     
+=======
+
+        # Should be able to access tokens via related name
+        user_tokens = self.user.oauth_tokens.all()
+
+        self.assertEqual(len(user_tokens), 2)
+        self.assertIn(token1, user_tokens)
+        self.assertIn(token2, user_tokens)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_is_expired_property_with_future_date(self):
         """Test is_expired property when token expires in the future."""
         future_time = timezone.now() + timedelta(hours=1)
         token = self.create_token(expires_at=future_time)
+<<<<<<< HEAD
         
         self.assertFalse(token.is_expired)
     
+=======
+
+        self.assertFalse(token.is_expired)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_is_expired_property_with_past_date(self):
         """Test is_expired property when token has expired."""
         past_time = timezone.now() - timedelta(hours=1)
         token = self.create_token(expires_at=past_time)
+<<<<<<< HEAD
         
         self.assertTrue(token.is_expired)
     
@@ -293,10 +423,22 @@ class OAuthTokenModelTests(TestCase):
         
         self.assertFalse(token.is_expired)  # No expiration means never expired
     
+=======
+
+        self.assertTrue(token.is_expired)
+
+    def test_is_expired_property_with_no_expiration(self):
+        """Test is_expired property when expires_at is None."""
+        token = self.create_token(expires_at=None)
+
+        self.assertFalse(token.is_expired)  # No expiration means never expired
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_expires_in_humanized_future_date(self):
         """Test expires_in_humanized for future expiration."""
         future_time = timezone.now() + timedelta(hours=2)
         token = self.create_token(expires_at=future_time)
+<<<<<<< HEAD
         
         humanized = token.expires_in_humanized
         
@@ -321,34 +463,79 @@ class OAuthTokenModelTests(TestCase):
         
         self.assertEqual(token.expires_in_humanized, "Never")
     
+=======
+
+        humanized = token.expires_in_humanized
+
+        # Should contain time reference (exact format may vary by Django version)
+        self.assertIsInstance(humanized, str)
+        self.assertNotEqual(humanized, "Never")
+
+    def test_expires_in_humanized_past_date(self):
+        """Test expires_in_humanized for past expiration."""
+        past_time = timezone.now() - timedelta(hours=2)
+        token = self.create_token(expires_at=past_time)
+
+        humanized = token.expires_in_humanized
+
+        # Should indicate past time
+        self.assertIsInstance(humanized, str)
+        self.assertNotEqual(humanized, "Never")
+
+    def test_expires_in_humanized_no_expiration(self):
+        """Test expires_in_humanized when expires_at is None."""
+        token = self.create_token(expires_at=None)
+
+        self.assertEqual(token.expires_in_humanized, "Never")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_username_property_with_username_field(self):
         """Test username property extracts from profile_json username field."""
         profile = ProfileDataFixtures.TWITTER_PROFILE.copy()
         token = self.create_token(profile_json=profile)
+<<<<<<< HEAD
         
         self.assertEqual(token.username, "testuser")
     
+=======
+
+        self.assertEqual(token.username, "testuser")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_username_property_with_login_field(self):
         """Test username property falls back to login field."""
         profile = ProfileDataFixtures.GITHUB_PROFILE.copy()
         del profile['username']  # Remove username field if it exists
         token = self.create_token(profile_json=profile)
+<<<<<<< HEAD
         
         self.assertEqual(token.username, "testuser")  # Should use login field
     
+=======
+
+        self.assertEqual(token.username, "testuser")  # Should use login field
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_username_property_fallback_to_name(self):
         """Test username property falls back to name field."""
         token = self.create_token(
             profile_json={'id': '123', 'name': 'Fallback Name'},
             name='Fallback Name'
         )
+<<<<<<< HEAD
         
         self.assertEqual(token.username, "Fallback Name")
     
+=======
+
+        self.assertEqual(token.username, "Fallback Name")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_username_property_with_null_values(self):
         """Test username property handles null and empty values."""
         profile = ProfileDataFixtures.NULL_NAME_PROFILE.copy()
         token = self.create_token(profile_json=profile, name='')
+<<<<<<< HEAD
         
         # Should fallback to login when name is null
         self.assertEqual(token.username, "nullnameuser")
@@ -360,19 +547,40 @@ class OAuthTokenModelTests(TestCase):
         # Should fall back to model name field
         self.assertEqual(token.username, "Model Name")
     
+=======
+
+        # Should fallback to login when name is null
+        self.assertEqual(token.username, "nullnameuser")
+
+    def test_username_property_empty_profile(self):
+        """Test username property with minimal profile data."""
+        token = self.create_token(profile_json={}, name='Model Name')
+
+        # Should fall back to model name field
+        self.assertEqual(token.username, "Model Name")
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_json_field_storage_and_retrieval(self):
         """Test JSONField properly stores and retrieves complex data."""
         complex_profile = ProfileDataFixtures.COMPLEX_NESTED_PROFILE
         token = self.create_token(profile_json=complex_profile)
+<<<<<<< HEAD
         
         # Refresh from database
         token.refresh_from_db()
         
+=======
+
+        # Refresh from database
+        token.refresh_from_db()
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Should preserve complex data structure
         self.assertEqual(token.profile_json['nested']['deep']['data'], 'value')
         self.assertEqual(token.profile_json['array_data'], [1, 2, 3])
         self.assertTrue(token.profile_json['boolean_field'])
         self.assertIsNone(token.profile_json['null_field'])
+<<<<<<< HEAD
     
     def test_json_field_null_value(self):
         """Test JSONField handles null values properly."""
@@ -383,6 +591,18 @@ class OAuthTokenModelTests(TestCase):
         # username property should handle null profile_json
         self.assertEqual(token.username, "Test User")  # Falls back to name field
     
+=======
+
+    def test_json_field_null_value(self):
+        """Test JSONField handles null values properly."""
+        token = self.create_token(profile_json=None)
+
+        self.assertIsNone(token.profile_json)
+
+        # username property should handle null profile_json
+        self.assertEqual(token.username, "Test User")  # Falls back to name field
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_field_max_lengths(self):
         """Test field max lengths where applicable."""
         # Test provider field (max_length=50)
@@ -395,7 +615,11 @@ class OAuthTokenModelTests(TestCase):
                 owner=self.user
             )
             token.full_clean()
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test name field (max_length=100)
         long_name = 'x' * 101  # 101 characters
         with self.assertRaises(ValidationError):
@@ -407,52 +631,90 @@ class OAuthTokenModelTests(TestCase):
                 name=long_name
             )
             token.full_clean()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_refresh_token_field_length(self):
         """Test refresh_token field can handle expected token lengths."""
         # Test with 500 character token (should work)
         long_token = 'x' * 500
         token = self.create_token(refresh_token=long_token)
+<<<<<<< HEAD
         
         self.assertEqual(len(token.refresh_token), 500)
         
+=======
+
+        self.assertEqual(len(token.refresh_token), 500)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Test with 501 character token (should fail validation)
         very_long_token = 'x' * 501
         with self.assertRaises(ValidationError):
             token = OAuthToken(
                 provider='twitter',
                 user_id='123',
+<<<<<<< HEAD
                 access_token='token', 
+=======
+                access_token='token',
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
                 refresh_token=very_long_token,
                 owner=self.user
             )
             token.full_clean()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_model_verbose_names(self):
         """Test model meta verbose names."""
         self.assertEqual(OAuthToken._meta.verbose_name, "OAuth Token")
         self.assertEqual(OAuthToken._meta.verbose_name_plural, "OAuth Tokens")
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_created_at_auto_now_add(self):
         """Test that created_at is automatically set on creation."""
         before_creation = timezone.now()
         token = self.create_token()
         after_creation = timezone.now()
+<<<<<<< HEAD
         
         self.assertIsNotNone(token.created_at)
         self.assertGreaterEqual(token.created_at, before_creation)
         self.assertLessEqual(token.created_at, after_creation)
         
+=======
+
+        self.assertIsNotNone(token.created_at)
+        self.assertGreaterEqual(token.created_at, before_creation)
+        self.assertLessEqual(token.created_at, after_creation)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Verify it doesn't change on update
         original_created_at = token.created_at
         token.name = "Updated Name"
         token.save()
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.assertEqual(token.created_at, original_created_at)
 
 class OAuthTokenQueryTests(TestCase):
     """Test cases for common OAuthToken queries."""
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def setUp(self):
         self.user = User.objects.create_user(
             username='testuser',
@@ -460,11 +722,19 @@ class OAuthTokenQueryTests(TestCase):
             password='testpass'
         )
         self.user2 = User.objects.create_user(
+<<<<<<< HEAD
             username='testuser2', 
             email='test2@example.com',
             password='testpass'
         )
     
+=======
+            username='testuser2',
+            email='test2@example.com',
+            password='testpass'
+        )
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_filter_by_provider(self):
         """Test filtering tokens by provider."""
         twitter_token = OAuthToken.objects.create(
@@ -479,15 +749,26 @@ class OAuthTokenQueryTests(TestCase):
             access_token='github_token',
             owner=self.user
         )
+<<<<<<< HEAD
         
         twitter_tokens = OAuthToken.objects.filter(provider='twitter')
         github_tokens = OAuthToken.objects.filter(provider='github')
         
+=======
+
+        twitter_tokens = OAuthToken.objects.filter(provider='twitter')
+        github_tokens = OAuthToken.objects.filter(provider='github')
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.assertIn(twitter_token, twitter_tokens)
         self.assertNotIn(github_token, twitter_tokens)
         self.assertIn(github_token, github_tokens)
         self.assertNotIn(twitter_token, github_tokens)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_filter_by_owner(self):
         """Test filtering tokens by owner."""
         user1_token = OAuthToken.objects.create(
@@ -502,15 +783,26 @@ class OAuthTokenQueryTests(TestCase):
             access_token='user2_token',
             owner=self.user2
         )
+<<<<<<< HEAD
         
         user1_tokens = OAuthToken.objects.filter(owner=self.user)
         user2_tokens = OAuthToken.objects.filter(owner=self.user2)
         
+=======
+
+        user1_tokens = OAuthToken.objects.filter(owner=self.user)
+        user2_tokens = OAuthToken.objects.filter(owner=self.user2)
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         self.assertIn(user1_token, user1_tokens)
         self.assertNotIn(user2_token, user1_tokens)
         self.assertIn(user2_token, user2_tokens)
         self.assertNotIn(user1_token, user2_tokens)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
     def test_filter_expired_tokens(self):
         """Test filtering expired vs non-expired tokens."""
         expired_token = OAuthToken.objects.create(
@@ -521,7 +813,11 @@ class OAuthTokenQueryTests(TestCase):
             owner=self.user
         )
         valid_token = OAuthToken.objects.create(
+<<<<<<< HEAD
             provider='github', 
+=======
+            provider='github',
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
             user_id='456',
             access_token='valid_token',
             expires_at=timezone.now() + timedelta(hours=1),
@@ -534,13 +830,21 @@ class OAuthTokenQueryTests(TestCase):
             expires_at=None,
             owner=self.user
         )
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Filter expired tokens
         expired_tokens = OAuthToken.objects.filter(expires_at__lt=timezone.now())
         self.assertIn(expired_token, expired_tokens)
         self.assertNotIn(valid_token, expired_tokens)
         self.assertNotIn(never_expires_token, expired_tokens)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
         # Filter valid tokens (not expired)
         valid_tokens = OAuthToken.objects.filter(
             models.Q(expires_at__gt=timezone.now()) | models.Q(expires_at__isnull=True)
@@ -559,4 +863,8 @@ class OAuthTokenQueryTests(TestCase):
 - [ ] Query pattern testing for common use cases
 - [ ] Model method testing for custom functionality
 - [ ] Edge case handling (null values, empty data, etc.)
+<<<<<<< HEAD
 - [ ] Performance considerations for common queries
+=======
+- [ ] Performance considerations for common queries
+>>>>>>> faace65 (Add comprehensive OAuth security, testing, and coverage infrastructure)
