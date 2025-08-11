@@ -40,6 +40,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Setup test environment
+        run: cp development/env.sample development/env
+
       - name: Run migrations
         run: uv run development/manage.py migrate
 
