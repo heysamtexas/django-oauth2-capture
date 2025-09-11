@@ -113,3 +113,5 @@ OAUTH2_CONFIG = {
 - `demo/` - Demo application showing usage examples
 
 When making changes, ensure compatibility with Django 5.1+ and Python 3.12+ as specified in pyproject.toml.
+
+- when running tests please run `uv run development/manage.py test` from the project root.
