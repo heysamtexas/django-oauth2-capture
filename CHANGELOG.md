@@ -1,3 +1,15 @@
+## 0.6.0 (2025-10-13)
+
+### Feat
+
+- **youtube**: add YouTube OAuth2 provider with HTTPS support
+- enable Django tests in GitHub Actions CI
+
+### Fix
+
+- use env.sample file for CI environment variables
+- use official astral-sh/ruff-action instead of uv run ruff
+
 ## 0.5.1 (2025-08-06)
 
 ### Fix
