@@ -26,6 +26,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()
+]
+
+# Force HTTPS in OAuth redirect URIs (required for some providers like Google/YouTube)
+FORCE_HTTPS_REDIRECT = os.environ.get("FORCE_HTTPS_REDIRECT", "false").lower() == "true"
+
 
 # Application definition
 
@@ -144,6 +151,11 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": False,
         },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
     },
 }
 
@@ -180,5 +192,10 @@ OAUTH2_CONFIG = {
         "client_id": os.environ["FACEBOOK_CLIENT_ID"],
         "client_secret": os.environ["FACEBOOK_CLIENT_SECRET"],
         "scope": "email public_profile pages_show_list pages_manage_posts business_management",
+    },
+    "youtube": {
+        "client_id": os.environ["YOUTUBE_CLIENT_ID"],
+        "client_secret": os.environ["YOUTUBE_CLIENT_SECRET"],
+        "scope": "https://www.googleapis.com/auth/youtube.upload profile",
     },
 }

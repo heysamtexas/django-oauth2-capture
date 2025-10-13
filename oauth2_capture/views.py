@@ -1,6 +1,7 @@
 import logging
 import secrets
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
@@ -54,7 +55,13 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     if not code:
         logger.error(f"No authorization code received for {provider}")
         return HttpResponse("No authorization code received from provider", status=400)
-    redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
+
+    # Some OAuth providers (e.g., Google/YouTube) require HTTPS redirect URIs
+    # Set FORCE_HTTPS_REDIRECT=true in environment when using such providers
+    if settings.FORCE_HTTPS_REDIRECT:
+        redirect_uri = f"https://{request.get_host()}/oauth2_capture/{provider}/callback/"
+    else:
+        redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
 
     token_data = oauth2_provider.exchange_code_for_token(code, redirect_uri, request)
 
@@ -66,9 +73,15 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
     if access_token:
         user_info = oauth2_provider.get_user_info(access_token)
 
+        # Use cascading ID strategy: YouTube channel ID -> Google user ID (sub) -> fallback
+        user_id = user_info.get("id")
+        if not user_id:
+            logger.warning(f"No user ID found for {provider}, using fallback ID")
+            user_id = f"{provider}_user_{request.user.id}"
+
         oauth_token, created = OAuthToken.objects.get_or_create(
             provider=provider,
-            user_id=user_info.get("id"),
+            user_id=user_id,
             owner=request.user,
         )
         oauth2_provider.update_token(oauth_token, token_data, user_info)
@@ -95,7 +108,14 @@ def initiate_oauth2(request: HttpRequest, provider: str) -> HttpResponse:
         return HttpResponse(str(e), status=400)
 
     state = secrets.token_urlsafe(32)
-    redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
+
+    # Some OAuth providers (e.g., Google/YouTube) require HTTPS redirect URIs
+    # Set FORCE_HTTPS_REDIRECT=true in environment when using such providers
+    if settings.FORCE_HTTPS_REDIRECT:
+        redirect_uri = f"https://{request.get_host()}/oauth2_capture/{provider}/callback/"
+    else:
+        redirect_uri = request.build_absolute_uri(f"/oauth2_capture/{provider}/callback/")
+
     auth_url = oauth2_provider.get_authorization_url(state, redirect_uri, request)
 
     # Store state in session for later verification

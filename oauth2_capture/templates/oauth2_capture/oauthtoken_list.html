@@ -14,6 +14,7 @@
                 <th>Username</th>
                 <th>Token Expired</th>
                 <th>Expired At</th>
+                <th>Access Token</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -25,11 +26,29 @@
                 <td style="text-align: center">{{ connection.is_expired }}</td>
                 <td>{{ connection.expires_in_humanized }}</td>
                 <td>
+                    <div style="display: flex; align-items: center; max-width: 300px;">
+                        <input
+                            type="text"
+                            value="{{ connection.access_token }}"
+                            readonly
+                            style="flex: 1; margin-right: 8px; font-family: monospace; font-size: 12px; padding: 4px;"
+                            id="token-{{ connection.id }}"
+                        >
+                        <button
+                            onclick="copyToken('token-{{ connection.id }}')"
+                            style="background: none; border: 1px solid #ccc; padding: 4px 8px; cursor: pointer;"
+                            title="Copy token to clipboard"
+                        >
+                            📋
+                        </button>
+                    </div>
+                </td>
+                <td>
                     <a href="{% url 'oauth2_capture:revoke' slug=connection.slug %}" title="Revoke {{ connection.provider }} ({{ connection.name }})">Revoke</a>
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="2">No connections</td></tr>
+            <tr><td colspan="6">No connections</td></tr>
         {% endfor %}
         </tbody>
     </table>
@@ -43,6 +62,7 @@
         <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='reddit' %}" onclick="openPopup(this.href); return false;">Reddit</a></li>
         <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='pinterest' %}" onclick="openPopup(this.href); return false;">Pinterest</a></li>
         <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='facebook' %}" onclick="openPopup(this.href); return false;">Facebook</a></li>
+        <li><a href="{% url 'oauth2_capture:initiate_oauth2' provider='youtube' %}" onclick="openPopup(this.href); return false;">YouTube</a></li>
     </ul>
     <hr/>
     <ul>
@@ -55,6 +75,39 @@
         const left = (screen.width / 2) - (width / 2);
         const top = (screen.height / 2) - (height / 2);
         window.open(url, 'oauthPopup', `width=${width},height=${height},scrollbars=yes,top=${top},left=${left}`);
+    }
+
+    function copyToken(inputId) {
+        const input = document.getElementById(inputId);
+        const token = input.value;
+
+        navigator.clipboard.writeText(token).then(function() {
+            // Show success feedback
+            const button = input.nextElementSibling;
+            const originalText = button.innerHTML;
+            button.innerHTML = '✓';
+            button.style.color = 'green';
+
+            setTimeout(function() {
+                button.innerHTML = originalText;
+                button.style.color = '';
+            }, 2000);
+        }).catch(function(err) {
+            // Fallback for older browsers
+            input.select();
+            input.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+
+            const button = input.nextElementSibling;
+            const originalText = button.innerHTML;
+            button.innerHTML = '✓';
+            button.style.color = 'green';
+
+            setTimeout(function() {
+                button.innerHTML = originalText;
+                button.style.color = '';
+            }, 2000);
+        });
     }
     </script>
 

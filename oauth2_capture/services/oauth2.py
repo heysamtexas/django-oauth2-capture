@@ -783,6 +783,131 @@ class FacebookOAuth2Provider(OAuth2Provider):
         return response.json()
 
 
+class YouTubeOAuth2Provider(OAuth2Provider):
+    """YouTube OAuth2 provider."""
+
+    @property
+    def authorize_url(self) -> str:
+        """The URL to authorize the user."""
+        return "https://accounts.google.com/o/oauth2/v2/auth"
+
+    @property
+    def token_url(self) -> str:
+        """The URL to exchange the code for a token."""
+        return "https://oauth2.googleapis.com/token"
+
+    @property
+    def user_info_url(self) -> str:
+        """The URL to get the user info."""
+        return "https://www.googleapis.com/youtube/v3/channels"
+
+    def get_authorization_url(self, state: str, redirect_uri: str, request: HttpRequest) -> str:  # noqa: ARG002
+        """Get the authorization URL for YouTube. Override to include access_type=offline.
+
+        Args:
+            state (str): The state parameter.
+            redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
+
+        Returns:
+            str: The authorization URL.
+
+        """
+        params = {
+            "client_id": self.config["client_id"],
+            "redirect_uri": redirect_uri,
+            "response_type": "code",
+            "state": state,
+            "scope": self.config["scope"],
+            "access_type": "offline",
+            "include_granted_scopes": "true",
+        }
+        return f"{self.authorize_url}?{urlencode(params)}"
+
+    def get_google_user_info(self, access_token: str) -> dict:
+        """Get Google user info as fallback when no YouTube channel exists.
+
+        Args:
+            access_token (str): The access token.
+
+        Returns:
+            dict: The Google user info with 'sub' as stable ID.
+
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers=headers, timeout=10)
+        if response.status_code == requests.codes.ok:
+            return response.json()
+        logger.warning("Failed to get Google user info: %s", response.text)
+        return {}
+
+    def get_user_info(self, access_token: str) -> dict:
+        """Get the user info from YouTube, with Google user info fallback.
+
+        Args:
+            access_token (str): The access token.
+
+        Returns:
+            dict: The user info.
+
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        params = {"part": "snippet", "mine": "true"}
+        response = requests.get(self.user_info_url, headers=headers, params=params, timeout=10)
+
+        data = response.json()
+        if "items" in data and len(data["items"]) > 0:
+            channel = data["items"][0]
+            user_info = {
+                "id": channel["id"],
+                "name": channel["snippet"]["title"],
+                "description": channel["snippet"].get("description", ""),
+                "thumbnail_url": channel["snippet"]["thumbnails"].get("default", {}).get("url", ""),
+            }
+            logger.debug("YouTube user info: %s", user_info)
+            return user_info
+
+        logger.warning("No YouTube channel found for user, falling back to Google user info")
+        google_user_info = self.get_google_user_info(access_token)
+        if google_user_info and "sub" in google_user_info:
+            return {
+                "id": google_user_info["sub"],
+                "name": google_user_info.get("name", "Google User"),
+                "email": google_user_info.get("email", ""),
+            }
+
+        logger.warning("No Google user info available")
+        return {}
+
+    def exchange_code_for_token(
+        self,
+        code: str,
+        redirect_uri: str,
+        request: HttpRequest,  # noqa: ARG002
+    ) -> dict:
+        """Exchange the auth code for an access token.
+
+        Args:
+            code (str): The code.
+            redirect_uri (str): The redirect URI.
+            request (HttpRequest): The request object.
+
+        Returns:
+            dict: The token data.
+
+        """
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect_uri,
+            "client_id": self.config["client_id"],
+            "client_secret": self.config["client_secret"],
+        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        response = requests.post(self.token_url, data=data, headers=headers, timeout=10)
+        return response.json()
+
+
 class OAuth2ProviderFactory:
     """Factory class to get the OAuth2 provider."""
 
@@ -804,6 +929,7 @@ class OAuth2ProviderFactory:
             "reddit": RedditOAuth2Provider,
             "pinterest": PinterestOAuth2Provider,
             "facebook": FacebookOAuth2Provider,
+            "youtube": YouTubeOAuth2Provider,
         }
         provider_class = providers.get(provider_name)
         if not provider_class:
