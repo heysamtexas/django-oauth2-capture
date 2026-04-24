@@ -22,7 +22,7 @@ classifiers = [
 ]
 description = "Capture and store OAuth2 tokens for later use."
 dependencies = [
-    "requests~=2.32.4",
+    "requests>=2.32.4,<2.34.0",
     "shortuuid==1.0.13",
     "Django>=4.2",
     "django-environ"
