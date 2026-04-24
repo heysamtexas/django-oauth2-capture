@@ -79,7 +79,7 @@ def oauth2_callback(request: HttpRequest, provider: str) -> HttpResponse:
             logger.warning(f"No user ID found for {provider}, using fallback ID")
             user_id = f"{provider}_user_{request.user.id}"
 
-        oauth_token, created = OAuthToken.objects.get_or_create(
+        oauth_token, _created = OAuthToken.objects.get_or_create(
             provider=provider,
             user_id=user_id,
             owner=request.user,
