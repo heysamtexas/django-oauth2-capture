@@ -82,7 +82,7 @@ def social_post(request: HttpRequest, provider: str, slug: str) -> HttpResponse:
         messages.error(request, f"Unsupported provider: {provider}")
         return redirect("/")
 
-    url, msg = post_function(token, oa2)
+    _url, msg = post_function(token, oa2)
     logger.info(msg)
     messages.success(request, msg)
     return redirect("/")
